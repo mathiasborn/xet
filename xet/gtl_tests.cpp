@@ -17,6 +17,8 @@ namespace gtl = boost::polygon;
 using namespace boost::polygon::operators;
 namespace pdf = PDFHummus;
 
+using namespace xet;
+
 constexpr double toPDF(int64_t u)
 {
 	return static_cast<double>(u)*(1.0e-9 / (2.54 / 100.0 / 72.0));	// nm -> 1/72in

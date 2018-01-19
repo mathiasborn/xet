@@ -156,6 +156,8 @@
     <ClInclude Include="gtl_tests.h" />
     <ClInclude Include="interfaces.h" />
     <ClInclude Include="platform.h" />
+    <ClInclude Include="py_parser.h" />
+    <ClInclude Include="py_literal_parser.h" />
     <ClInclude Include="py_xet.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -165,6 +167,7 @@
     <ClCompile Include="gtl_tests.cpp" />
     <ClCompile Include="platform_windows.cpp" />
     <ClCompile Include="py_parser.cpp" />
+    <ClCompile Include="py_literal_parser.cpp" />
     <ClCompile Include="py_xet.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

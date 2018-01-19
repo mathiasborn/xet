@@ -1,23 +1,17 @@
 #include "stdafx.h"
 #include <string>
+#include <fstream>
+#include <sstream>
+
 #include <boost/config/warning_disable.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/support.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 
+#include "py_literal_parser.h"
+
 namespace qi = boost::spirit::qi;
 using namespace boost::spirit;
-
-// http://stackoverflow.com/questions/10474571/how-to-match-unicode-characters-with-boostspirit
-// http://boost-spirit.com/home/wp-content/uploads/2010/05/A_Framework_for_RAD_Spirit.pdf
-// http://www.boost.org/doc/libs/1_62_0/libs/regex/doc/html/boost_regex/ref/internal_details/uni_iter.html
-// http://www.nubaria.com/en/blog/?p=289
-// http://www.cprogramming.com/tutorial/unicode.html
-
-// This is needed to make qi::phrase_parse work with ustring::const_iterator.
-namespace boost {
-template<> struct is_scalar<std::u32string::const_iterator> : public true_type {};
-}
 
 template <typename Iterator>
 struct PyCommonParser
@@ -29,8 +23,8 @@ public:
 		using qi::unicode::blank;
 		using qi::int_;
 		using qi::no_case;
-/*
-		NAME = lexeme[+char_(L"0-9A-Za-z_")];
+
+		NAME = lexeme[char_(L"A-Za-z_") >> *char_(L"0-9A-Za-z_")];
 		NEWLINE = eol;
 		ASYNC = "async";
 		AWAIT = "await";
@@ -60,7 +54,7 @@ public:
 		'*' >> -vfpdef >> *(',' >> vfpdef >> -('=' >> test)) >> -(',' >> -("**" >> vfpdef >> -lit(','))) |
 		"**" >> vfpdef >> -lit(',');
 
-		vfpdef = NAME;
+		vfpdef = NAME.alias();
 
 		stmt = simple_stmt | compound_stmt;
 		simple_stmt = small_stmt >> *(';' >> small_stmt) >> -lit(';') >> NEWLINE;
@@ -76,7 +70,7 @@ public:
 		break_stmt = "break";
 		continue_stmt = "continue";
 		return_stmt = "return" >> -testlist;
-		yield_stmt = yield_expr;
+		yield_stmt = yield_expr.alias();
 		raise_stmt = "raise" >> -(test >> -("from" >> test));
 		import_stmt = import_name | import_from;
 		import_name = "import" >> dotted_as_names;
@@ -129,7 +123,7 @@ public:
 		atom = '(' >> -(yield_expr | testlist_comp) >> ')' |
 			'[' >> -testlist_comp >> ']' |
 			'{' >> -dictorsetmaker >> '}' |
-			NAME | NUMBER | +STRING | "..." | "None" | "True" | "False";
+			NAME | lexeme[NUMBER] | +lexeme[STRING] | "..." | "None" | "True" | "False";
 		testlist_comp = (test | star_expr) >> (comp_for | *(',' >> (test | star_expr)) >> -lit(','));
 		trailer = '(' >> -arglist >> ')' | '[' >> subscriptlist >> ']' | '.' >> NAME;
 		subscriptlist = subscript >> *(',' >> subscript) >> -lit(',');
@@ -145,7 +139,7 @@ public:
 
 		arglist = argument >> *(',' >> argument) >> -lit(',');
 
-		argument = test >> -comp_for | test >> '=' >> test | "**" >> test | '*' >> test;
+		argument = test >> '=' >> test | test >> -comp_for | "**" >> test | '*' >> test;
 
 		comp_iter = comp_for | comp_if;
 		comp_for = -ASYNC >> "for" >> exprlist >> "in" >> or_test >> -comp_iter;
@@ -153,13 +147,107 @@ public:
 
 		yield_expr = "yield" >> -yield_arg;
 		yield_arg = "from" >> test | testlist;
-*/
+
+		//BOOST_SPIRIT_DEBUG_NODE(STRING);
+		BOOST_SPIRIT_DEBUG_NODE(NAME);
+		BOOST_SPIRIT_DEBUG_NODE(NEWLINE);
+		BOOST_SPIRIT_DEBUG_NODE(ASYNC);
+		BOOST_SPIRIT_DEBUG_NODE(INDENT);
+		BOOST_SPIRIT_DEBUG_NODE(DEDENT);
+		BOOST_SPIRIT_DEBUG_NODE(AWAIT);
+		BOOST_SPIRIT_DEBUG_NODE(single_input);
+		BOOST_SPIRIT_DEBUG_NODE(file_input);
+		BOOST_SPIRIT_DEBUG_NODE(eval_input);
+		BOOST_SPIRIT_DEBUG_NODE(decorator);
+		BOOST_SPIRIT_DEBUG_NODE(decorators);
+		BOOST_SPIRIT_DEBUG_NODE(decorated);
+		BOOST_SPIRIT_DEBUG_NODE(async_funcdef);
+		BOOST_SPIRIT_DEBUG_NODE(funcdef);
+		BOOST_SPIRIT_DEBUG_NODE(parameters);
+		BOOST_SPIRIT_DEBUG_NODE(typedargslist);
+		BOOST_SPIRIT_DEBUG_NODE(tfpdef);
+		BOOST_SPIRIT_DEBUG_NODE(varargslist);
+		BOOST_SPIRIT_DEBUG_NODE(vfpdef);
+		BOOST_SPIRIT_DEBUG_NODE(stmt);
+		BOOST_SPIRIT_DEBUG_NODE(simple_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(small_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(expr_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(annassign);
+		BOOST_SPIRIT_DEBUG_NODE(testlist_star_expr);
+		BOOST_SPIRIT_DEBUG_NODE(augassign);
+		BOOST_SPIRIT_DEBUG_NODE(del_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(pass_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(flow_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(break_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(continue_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(return_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(yield_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(raise_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(import_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(import_name);
+		BOOST_SPIRIT_DEBUG_NODE(import_from);
+		BOOST_SPIRIT_DEBUG_NODE(import_as_name);
+		BOOST_SPIRIT_DEBUG_NODE(dotted_as_name);
+		BOOST_SPIRIT_DEBUG_NODE(import_as_names);
+		BOOST_SPIRIT_DEBUG_NODE(dotted_as_names);
+		BOOST_SPIRIT_DEBUG_NODE(dotted_name);
+		BOOST_SPIRIT_DEBUG_NODE(global_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(nonlocal_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(assert_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(compound_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(async_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(if_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(while_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(for_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(try_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(with_stmt);
+		BOOST_SPIRIT_DEBUG_NODE(with_item);
+		BOOST_SPIRIT_DEBUG_NODE(except_clause);
+		BOOST_SPIRIT_DEBUG_NODE(suite);
+		BOOST_SPIRIT_DEBUG_NODE(test);
+		BOOST_SPIRIT_DEBUG_NODE(test_nocond);
+		BOOST_SPIRIT_DEBUG_NODE(lambdef);
+		BOOST_SPIRIT_DEBUG_NODE(lambdef_nocond);
+		BOOST_SPIRIT_DEBUG_NODE(or_test);
+		BOOST_SPIRIT_DEBUG_NODE(and_test);
+		BOOST_SPIRIT_DEBUG_NODE(not_test);
+		BOOST_SPIRIT_DEBUG_NODE(comparison);
+		BOOST_SPIRIT_DEBUG_NODE(comp_op);
+		BOOST_SPIRIT_DEBUG_NODE(star_expr);
+		BOOST_SPIRIT_DEBUG_NODE(expr);
+		BOOST_SPIRIT_DEBUG_NODE(xor_expr);
+		BOOST_SPIRIT_DEBUG_NODE(and_expr);
+		BOOST_SPIRIT_DEBUG_NODE(shift_expr);
+		BOOST_SPIRIT_DEBUG_NODE(arith_expr);
+		BOOST_SPIRIT_DEBUG_NODE(term);
+		BOOST_SPIRIT_DEBUG_NODE(factor);
+		BOOST_SPIRIT_DEBUG_NODE(power);
+		BOOST_SPIRIT_DEBUG_NODE(atom_expr);
+		BOOST_SPIRIT_DEBUG_NODE(atom);
+		BOOST_SPIRIT_DEBUG_NODE(testlist_comp);
+		BOOST_SPIRIT_DEBUG_NODE(trailer);
+		BOOST_SPIRIT_DEBUG_NODE(subscriptlist);
+		BOOST_SPIRIT_DEBUG_NODE(subscript);
+		BOOST_SPIRIT_DEBUG_NODE(sliceop);
+		BOOST_SPIRIT_DEBUG_NODE(exprlist);
+		BOOST_SPIRIT_DEBUG_NODE(testlist);
+		BOOST_SPIRIT_DEBUG_NODE(dictorsetmaker);
+		BOOST_SPIRIT_DEBUG_NODE(classdef);
+		BOOST_SPIRIT_DEBUG_NODE(arglist);
+		BOOST_SPIRIT_DEBUG_NODE(argument);
+		BOOST_SPIRIT_DEBUG_NODE(comp_iter);
+		BOOST_SPIRIT_DEBUG_NODE(comp_for);
+		BOOST_SPIRIT_DEBUG_NODE(comp_if);
+		BOOST_SPIRIT_DEBUG_NODE(yield_expr);
+		BOOST_SPIRIT_DEBUG_NODE(yield_arg);
 
 	};
 	typedef qi::unicode::blank_type Skipper;
 	typedef qi::rule<Iterator, void(), Skipper> Rule;
 
-	Rule NAME, NEWLINE, ASYNC, INDENT, DEDENT, AWAIT, NUMBER, STRING;
+	PyStrParser<Iterator> STRING;
+	PyNumberParser<Iterator> NUMBER;
+	Rule NAME, NEWLINE, ASYNC, INDENT, DEDENT, AWAIT;
 	Rule single_input;
 	Rule file_input;
 	Rule eval_input;
@@ -259,8 +347,23 @@ struct PyExprParser : qi::grammar<Iterator, void(), qi::unicode::blank_type>, pu
 
 bool parsePythonExpression(std::u32string::const_iterator& first, std::u32string::const_iterator last)
 {
+#	ifdef BOOST_SPIRIT_DEBUG
+	std::streambuf* strm_buffer = std::cout.rdbuf();
+	std::ofstream file("cout.xml");
+	std::cout.rdbuf(file.rdbuf());
+	std::cerr.tie(&std::cout);
+	std::cout << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" << std::endl;// << "<start>" << std::endl;
+#	endif	
+
 	PyExprParser<std::u32string::const_iterator> parser;
-	return qi::phrase_parse(first, last, parser, unicode::blank, qi::skip_flag::dont_postskip);
+	auto r = qi::phrase_parse(first, last, parser, unicode::blank, qi::skip_flag::dont_postskip);
+
+#	ifdef BOOST_SPIRIT_DEBUG
+	//std::cout << "</start>" << std::endl;
+	std::cout.rdbuf(strm_buffer);
+#	endif	
+
+	return r;
 }
 
 

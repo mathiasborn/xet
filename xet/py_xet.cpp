@@ -259,13 +259,13 @@ void initializePythonInterpreter()
 		//exec_file(py::str(f.wstring()), global, global);
 		object autostart_module = import("xet_test");
 		autostart_module.attr("run")();
-
+/*
 		auto node = PyParser_SimpleParseString(
 			//"frame(pos=center, width=5)", 0);
 			"frame(n=10) {hallo}", Py_single_input);
 		std::cerr << pythonExceptionToText() << std::endl;
 		//auto mod = PyParser_ASTFromString("2+3", "", 0, 0, 0);
-
+*/
 	});
 }
 
