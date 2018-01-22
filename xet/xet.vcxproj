@@ -162,6 +162,8 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="unicode_string_support.h" />
+    <ClInclude Include="xet_line_pos_iterator.h" />
+    <ClInclude Include="xet_parser.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gtl_tests.cpp" />
@@ -177,6 +179,7 @@
     </ClCompile>
     <ClCompile Include="unicode_string_support.cpp" />
     <ClCompile Include="xet.cpp" />
+    <ClCompile Include="xet_parser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="xet_test.py" />
