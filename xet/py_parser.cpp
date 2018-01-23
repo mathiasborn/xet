@@ -239,12 +239,13 @@ template <typename Iterator, typename Skipper> PyCommonParser<Iterator, Skipper>
 }
 
 
-template <typename Iterator, typename Skipper> PyExprParser<Iterator, Skipper>::PyExprParser(): PyExprParser::base_type(testlist, "testlist")
+template <typename Iterator, typename Skipper> PyExprParser<Iterator, Skipper>::PyExprParser(): PyExprParser::base_type(start, "py_expr")
 {
+	start = raw[testlist];
 }
 
 
-bool parsePythonExpression(std::u32string::const_iterator& first, std::u32string::const_iterator last)
+bool parsePythonExpression(std::u32string::const_iterator& first, std::u32string::const_iterator last, boost::iterator_range<std::u32string::const_iterator>& result)
 {
 #	ifdef BOOST_SPIRIT_DEBUG
 	std::streambuf* strm_buffer = std::cout.rdbuf();
@@ -255,7 +256,7 @@ bool parsePythonExpression(std::u32string::const_iterator& first, std::u32string
 #	endif	
 
 	PyExprParser<std::u32string::const_iterator, qi::unicode::blank_type> parser;
-	auto r = qi::phrase_parse(first, last, parser, unicode::blank, qi::skip_flag::dont_postskip);
+	auto r = qi::phrase_parse(first, last, parser, unicode::blank, qi::skip_flag::dont_postskip, result);
 
 #	ifdef BOOST_SPIRIT_DEBUG
 	//std::cout << "</start>" << std::endl;

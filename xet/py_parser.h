@@ -105,11 +105,13 @@ struct PyCommonParser
 
 
 template <typename Iterator, typename Skipper>
-struct PyExprParser: qi::grammar<Iterator, void(), Skipper>, public PyCommonParser<Iterator, Skipper>
+struct PyExprParser: qi::grammar<Iterator, boost::iterator_range<Iterator>(), Skipper>, public PyCommonParser<Iterator, Skipper>
 {
 	PyExprParser();
+	qi::rule<Iterator, boost::iterator_range<Iterator>(), Skipper> start;
+
 };
 
 
-bool parsePythonExpression(std::u32string::const_iterator& first, std::u32string::const_iterator last);
+bool parsePythonExpression(std::u32string::const_iterator& first, std::u32string::const_iterator last, boost::iterator_range<std::u32string::const_iterator>& result);
 
