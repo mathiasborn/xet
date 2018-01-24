@@ -104,11 +104,11 @@ struct PyCommonParser
 };
 
 
-template <typename Iterator, typename Skipper>
-struct PyExprParser: qi::grammar<Iterator, boost::iterator_range<Iterator>(), Skipper>, public PyCommonParser<Iterator, Skipper>
+template <typename Iterator>
+struct PyExprParser: qi::grammar<Iterator, boost::iterator_range<Iterator>()>, public PyCommonParser<Iterator, qi::unicode::blank_type>
 {
 	PyExprParser();
-	qi::rule<Iterator, boost::iterator_range<Iterator>(), Skipper> start;
+	qi::rule<Iterator, boost::iterator_range<Iterator>()> start;
 
 };
 

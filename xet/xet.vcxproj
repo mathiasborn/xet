@@ -165,6 +165,7 @@
     <ClInclude Include="xet_input.h" />
     <ClInclude Include="xet_line_pos_iterator.h" />
     <ClInclude Include="xet_parser.h" />
+    <ClInclude Include="xet_parser_skipper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gtl_tests.cpp" />
@@ -182,6 +183,7 @@
     <ClCompile Include="xet.cpp" />
     <ClCompile Include="xet_input.cpp" />
     <ClCompile Include="xet_parser.cpp" />
+    <ClCompile Include="xet_parser_skipper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="xet_test.py" />

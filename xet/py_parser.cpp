@@ -239,9 +239,9 @@ template <typename Iterator, typename Skipper> PyCommonParser<Iterator, Skipper>
 }
 
 
-template <typename Iterator, typename Skipper> PyExprParser<Iterator, Skipper>::PyExprParser(): PyExprParser::base_type(start, "py_expr")
+template <typename Iterator> PyExprParser<Iterator>::PyExprParser(): PyExprParser::base_type(start, "py_expr")
 {
-	start = raw[testlist];
+	start = raw[skip(unicode::blank)[testlist]];
 }
 
 
@@ -255,8 +255,8 @@ bool parsePythonExpression(std::u32string::const_iterator& first, std::u32string
 	std::cout << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" << std::endl;// << "<start>" << std::endl;
 #	endif	
 
-	PyExprParser<std::u32string::const_iterator, qi::unicode::blank_type> parser;
-	auto r = qi::phrase_parse(first, last, parser, unicode::blank, qi::skip_flag::dont_postskip, result);
+	PyExprParser<std::u32string::const_iterator> parser;
+	auto r = qi::parse(first, last, parser, result);
 
 #	ifdef BOOST_SPIRIT_DEBUG
 	//std::cout << "</start>" << std::endl;
@@ -271,8 +271,7 @@ bool parsePythonExpression(std::u32string::const_iterator& first, std::u32string
 // instantiate the method of the grammar.
 static void instantiate_parser()
 {
-	typedef std::u32string::const_iterator iterator_type;
-	//skipper<iterator_type> g1;
-	PyExprParser<iterator_type> g2;
+	typedef std::u32string::const_iterator Iterator;
+	PyExprParser<Iterator, parser::XetSkipper<Iterator>> g;
 }
 */
