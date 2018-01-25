@@ -138,6 +138,7 @@ XetParser<Iterator, Skipper>::XetParser() : XetParser::base_type(start, "start")
 {
 	using qi::unicode::char_;
 	using qi::unicode::graph;
+	using qi::unicode::blank;
 	using boost::fusion::at_c;
 
 	start = tokens.alias();
@@ -155,9 +156,10 @@ XetParser<Iterator, Skipper>::XetParser() : XetParser::base_type(start, "start")
 	py_code_end = no_skip[eol >> '}'];
 	py_code = lexeme[skip[py_code_beg] > raw[*(!py_code_end >> char_)] > py_code_end];
 
-	new_paragraph = omit[lit(L'\u2029')] > attr(ph::construct<NewParagraph>());
+	new_paragraph_pattern = L'\u2029';
+	new_paragraph = new_paragraph_pattern > attr(ph::construct<NewParagraph>());
 
-	text = raw[+(graph - '}' - '\\')] >> eps;
+	text = raw[lexeme[+(char_ - char_("{}\\#") - eol - blank - new_paragraph_pattern)]] >> eps;
 
 	tokens = *(py_code | py_expr | new_paragraph | block | text);
 

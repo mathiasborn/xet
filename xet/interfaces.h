@@ -128,12 +128,15 @@ class Token
 {
 public:
 	virtual ~Token() {};
-	virtual bool isText() const { return false; }
-	virtual bool isExpandable() const { return false; }
+	virtual bool isCode() const { return false; }
+//	virtual void addedToPage(PPage&) {};
+//	virtual void addedToTypeSetter() {};
+	std::u32string const& cachedText() const { return m_text; }
+	void cacheText() { m_text = text(); }
+protected:
 	virtual std::u32string const& text() const { return {}; }
-	//virtual bool isActive() const { return false; }
-	virtual void addedToPage(PPage&) {};
-	virtual void addedToTypeSetter() {};
+private:
+	std::u32string m_text;
 };
 
 /*

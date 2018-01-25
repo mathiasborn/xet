@@ -99,7 +99,7 @@ struct XetParser: qi::grammar<Iterator, Tokens(), Skipper>
 	XetParser();
 
 	qi::rule<Iterator, void(), Skipper> py_code_beg;
-	qi::rule<Iterator, void()> py_code_end, py_identifier;
+	qi::rule<Iterator, void()> py_code_end, py_identifier, new_paragraph_pattern;
 	PyExprParser<Iterator> _py_expr;
 	qi::rule<Iterator, PyExpr(), Skipper> py_expr;
 	qi::rule<Iterator, PyCode(), Skipper> py_code;
