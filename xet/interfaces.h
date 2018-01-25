@@ -16,9 +16,9 @@ namespace xet {
 
 namespace boost {
 	namespace polygon {
-/*
+
 		template <>
-		struct coordinate_traits<int64_t> {
+		struct coordinate_traits<xet::Size> {
 			typedef int64_t coordinate_type;
 			typedef long double area_type;
 			typedef mp::int128_t manhattan_area_type;
@@ -26,7 +26,7 @@ namespace boost {
 			typedef mp::int128_t coordinate_difference;
 			typedef mp::cpp_rational coordinate_distance;
 		};
-*/
+
 		template <>
 		struct high_precision_type<int64_t> {
 			typedef mp::cpp_rational type;
