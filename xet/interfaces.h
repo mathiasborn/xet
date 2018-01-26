@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <tuple>
+#include <memory>
 #include <boost/polygon/polygon.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/preprocessor/cat.hpp>
@@ -16,7 +17,7 @@ namespace xet {
 
 namespace boost {
 	namespace polygon {
-
+/*
 		template <>
 		struct coordinate_traits<xet::Size> {
 			typedef int64_t coordinate_type;
@@ -26,7 +27,7 @@ namespace boost {
 			typedef mp::int128_t coordinate_difference;
 			typedef mp::cpp_rational coordinate_distance;
 		};
-
+*/
 		template <>
 		struct high_precision_type<int64_t> {
 			typedef mp::cpp_rational type;
@@ -122,22 +123,44 @@ public:
 };
 
 
+namespace input {
+
 // input stream
 
 class Token
 {
 public:
 	virtual ~Token() {};
-	virtual bool isCode() const { return false; }
-//	virtual void addedToPage(PPage&) {};
-//	virtual void addedToTypeSetter() {};
-	std::u32string const& cachedText() const { return m_text; }
-	void cacheText() { m_text = text(); }
-protected:
+	//	virtual void addedToPage(PPage&) {};
+	//	virtual void addedToTypeSetter() {};
+};
+
+typedef std::shared_ptr<Token> PToken;
+typedef std::vector<PToken> Tokens;
+
+class Marker: public Token {};
+
+class Text: public Token
+{
+public:
+	Text() {};
+	Text(std::u32string const& text): m_text(text) {};
+
 	virtual std::u32string const& text() const { return {}; }
 private:
 	std::u32string m_text;
 };
+
+class Callable: public Text
+{
+public:
+	Callable() {};
+	Callable(Tokens&& block, std::u32string const& text): m_block{std::move(block)}, Text{text} {};
+protected:
+	Tokens m_block;
+};
+
+glue, penalty, ...
 
 /*
 class Text: public Token
@@ -148,6 +171,8 @@ class Text: public Token
 };
 */
 
-};
+} // namespace input
+
+} // namespace xet
 
 #undef GET
