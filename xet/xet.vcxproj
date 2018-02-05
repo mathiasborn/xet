@@ -112,7 +112,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(python64)/libs;$(pdfwriter)/x64-Debug/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(boost)\stage\lib;$(python64)/libs;$(pdfwriter)/x64-Debug/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>PDFWriter.lib;FreeType.lib;LibAesgm.lib;LibJpeg.lib;LibPng.lib;LibTiff.lib;Zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

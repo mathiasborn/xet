@@ -1,26 +1,38 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2009
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xet", "xet\xet.vcxproj", "{E5918A3F-402F-4C68-A7BB-26BC2BE1A6DC}"
 EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "py_test", "py_test\py_test.pyproj", "{C8FD8554-06A6-4731-B3DA-FAFF3BDE02BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E5918A3F-402F-4C68-A7BB-26BC2BE1A6DC}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{E5918A3F-402F-4C68-A7BB-26BC2BE1A6DC}.Debug|x64.ActiveCfg = Debug|x64
 		{E5918A3F-402F-4C68-A7BB-26BC2BE1A6DC}.Debug|x64.Build.0 = Debug|x64
 		{E5918A3F-402F-4C68-A7BB-26BC2BE1A6DC}.Debug|x86.ActiveCfg = Debug|Win32
 		{E5918A3F-402F-4C68-A7BB-26BC2BE1A6DC}.Debug|x86.Build.0 = Debug|Win32
+		{E5918A3F-402F-4C68-A7BB-26BC2BE1A6DC}.Release|Any CPU.ActiveCfg = Release|Win32
 		{E5918A3F-402F-4C68-A7BB-26BC2BE1A6DC}.Release|x64.ActiveCfg = Release|x64
 		{E5918A3F-402F-4C68-A7BB-26BC2BE1A6DC}.Release|x64.Build.0 = Release|x64
 		{E5918A3F-402F-4C68-A7BB-26BC2BE1A6DC}.Release|x86.ActiveCfg = Release|Win32
 		{E5918A3F-402F-4C68-A7BB-26BC2BE1A6DC}.Release|x86.Build.0 = Release|Win32
+		{C8FD8554-06A6-4731-B3DA-FAFF3BDE02BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8FD8554-06A6-4731-B3DA-FAFF3BDE02BD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C8FD8554-06A6-4731-B3DA-FAFF3BDE02BD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C8FD8554-06A6-4731-B3DA-FAFF3BDE02BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8FD8554-06A6-4731-B3DA-FAFF3BDE02BD}.Release|x64.ActiveCfg = Release|Any CPU
+		{C8FD8554-06A6-4731-B3DA-FAFF3BDE02BD}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
