@@ -20,13 +20,13 @@
 #include "py_xet.h"
 #include "unicode_string_support.h"
 #include "platform.h"
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include <boost/python/suite/indexing/map_indexing_suite.hpp>
 #include <boost/filesystem.hpp>
+#include <pybind11/embed.h>
 #include <fcntl.h>
 
-using namespace boost::python;
+namespace py = pybind11;
 
+/*
 PyException::PyException()
 {
 	try
@@ -59,6 +59,7 @@ void PyException::PyErr_Restore()
 {
 	::PyErr_Restore(m_exc.release(), m_val.release(), m_tb.release());
 }
+
 
 std::string pythonExceptionToText()
 {
@@ -169,39 +170,6 @@ public:
 
 BOOST_PYTHON_MODULE(xet)
 {
-/*
-	using namespace spice;
-	{
-		scope inDDevice = class_<DDevice>("DDevice")
-			.add_property("name", make_getter(&DDevice::name, return_value_policy<return_by_value>()), make_setter(&DDevice::name, return_value_policy<return_by_value>()))
-			.def_readwrite("nodes", &DDevice::nodes)
-			.add_property("model", make_getter(&DDevice::model, return_value_policy<return_by_value>()), make_setter(&DDevice::model, return_value_policy<return_by_value>()))
-			.def("prefix", &DDevice::prefix)
-			.def(self == self);
-		enum_<DDevice::Source>("Source")
-			.value("Voltage", DDevice::Voltage)
-			.value("Current", DDevice::Current);
-		enum_<DDevice::Type>("Type")
-			.value("Behavioral", DDevice::Behavioral)
-			.value("Gain", DDevice::Gain)
-			.value("Table", DDevice::Table)
-			.value("Laplace", DDevice::Laplace);
-	}
-	class_<DBase>("DBase");
-	class_<DIgnore, bases<DDevice>>("DIgnore")
-		.add_property("text", make_getter(&DIgnore::text, return_value_policy<return_by_value>()), make_setter(&DIgnore::text, return_value_policy<return_by_value>()))
-		.def(self == self);
-	class_<DInclude, bases<DBase>>("DInclude")
-		.add_property("file_name", make_getter(&DInclude::file_name, return_value_policy<return_by_value>()), make_setter(&DInclude::file_name, return_value_policy<return_by_value>()))
-		.add_property("lib_name", make_getter(&DInclude::lib_name, return_value_policy<return_by_value>()), make_setter(&DInclude::lib_name, return_value_policy<return_by_value>()))
-		.def(self == self);
-	class_<DSubCkt, bases<DBase>>("DSubCkt")
-		.add_property("name", make_getter(&DSubCkt::name, return_value_policy<return_by_value>()), make_setter(&DSubCkt::name, return_value_policy<return_by_value>()))
-		.def_readwrite("nodes", &DSubCkt::nodes);
-	class_<NetList>("NetList")
-		.add_property("text", make_getter(&NetList::text, return_value_policy<return_by_value>()), make_setter(&NetList::text, return_value_policy<return_by_value>()));
-	def("findSubCkt", findSubCkt);
-*/
 	class_<TestClass>("TestClass",
 		init<int, int64_t, tuple>((arg("z")=10, arg("width")=100, arg("adjustment")=tuple())))
 	;
@@ -211,6 +179,32 @@ BOOST_PYTHON_MODULE(xet)
 	scope().attr("nm") =          1;
 
 }
+*/
+
+class TestClass
+{
+public:
+	TestClass(int z, int64_t width, py::tuple adjustment)
+	{
+		std::cout << "z=" << z << " width=" << width << " len(adjustment)=" << py::len(adjustment) << std::endl;
+	};
+};
+
+PYBIND11_EMBEDDED_MODULE(xet, m)
+{
+	using namespace py::literals;
+		
+	m.attr("cm") = 10'000'000;
+	m.attr("mm") = 1'000'000;
+	m.attr("um") = 1'000;
+	m.attr("nm") = 1;
+
+	py::class_<TestClass> testClass(m, "TestClass");
+	testClass
+		.def(py::init<int, int64_t, py::tuple>(), "z"_a = 10, "width"_a = 100, "adjustment"_a = py::tuple{});
+
+}
+
 
 void initializePythonInterpreter()
 {
@@ -227,20 +221,7 @@ void initializePythonInterpreter()
 	else
 	{
 	}
-	PyImport_AppendInittab("xet", PyInit_xet);
-
 /*
-    _setmode(fileno(stdin), O_BINARY);
-    _setmode(fileno(stdout), O_BINARY);
-    _setmode(fileno(stderr), O_BINARY);
-    setvbuf(stdin,  (char *)NULL, _IONBF, BUFSIZ);
-    setvbuf(stdout, (char *)NULL, _IONBF, BUFSIZ);
-    setvbuf(stderr, (char *)NULL, _IONBF, BUFSIZ);
-*/
-
-	Py_Initialize();
-	InitializeConverters();
-
 	// NoProxy=true is default for std::string elements
 	class_<std::vector<std::string>>("string_vector")
 		.def(vector_indexing_suite<std::vector<std::string>>());
@@ -248,24 +229,18 @@ void initializePythonInterpreter()
 	// This only works with NoProxy=true?
 	class_<std::vector<std::u32string>>("u32string_vector")
 		.def(vector_indexing_suite<std::vector<std::u32string>, true>());
-
+*/
 	guarded_python([&]()
 	{
-		object sys_module = import("sys");
+		py::object sys_module = py::module::import("sys");
 		sys_module.attr("dont_write_bytecode") = true;
-		object main_module = import("__main__");
-		object global = main_module.attr("__dict__");
+		py::object main_module = py::module::import("__main__");
+		py::object global = main_module.attr("__dict__");
 		//fs::path f = appDir / ".." / "python" / "autostart.py";
 		//exec_file(py::str(f.wstring()), global, global);
-		object autostart_module = import("xet_test");
+		py::object autostart_module = py::module::import("xet_test");
 		autostart_module.attr("run")();
-/*
-		auto node = PyParser_SimpleParseString(
-			//"frame(pos=center, width=5)", 0);
-			"frame(n=10) {hallo}", Py_single_input);
-		std::cerr << pythonExceptionToText() << std::endl;
-		//auto mod = PyParser_ASTFromString("2+3", "", 0, 0, 0);
-*/
 	});
+
 }
 

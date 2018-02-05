@@ -15,18 +15,14 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ***************************************************************************/
-#ifndef PY_XET_H
-#define PY_XET_H
+#pragma once
 
 #include "stdafx.h"
 #include <boost/function.hpp>
-#include <boost/python.hpp>
-
-namespace py = boost::python;
-
 
 void initializePythonInterpreter();
 
+/*
 class PyException: public std::exception
 {
 	std::string m_text;
@@ -36,8 +32,9 @@ public:
 	virtual const char *what() const { return m_text.c_str(); }
 	void PyErr_Restore();
 };
+*/
 
-std::string pythonExceptionToText();	// return UTF-8
+//std::string pythonExceptionToText();	// return UTF-8
 
 template<typename Function>
 auto guarded_python(Function const& func)->decltype(func())
@@ -46,9 +43,10 @@ auto guarded_python(Function const& func)->decltype(func())
 	{
 		return func();
 	}
-	catch (py::error_already_set const &)
+	catch (py::error_already_set const & e)
 	{
-		auto s = pythonExceptionToText();
+		//auto s = pythonExceptionToText();
+		auto s = e.what();
 		std::cerr << s << std::endl;
 	}
 	catch (std::exception const& e)
@@ -59,7 +57,7 @@ auto guarded_python(Function const& func)->decltype(func())
 	return T();
 }
 
-
+/*
 // Convert py::error_already_set into std::exception
 template<typename Function>
 auto std_python(Function const& func)->decltype(func())
@@ -75,6 +73,5 @@ auto std_python(Function const& func)->decltype(func())
 	typedef decltype(func()) T;
 	return T();
 }
+*/
 
-
-#endif // PY_XET_H
