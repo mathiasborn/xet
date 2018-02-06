@@ -35,3 +35,41 @@ void test_xet_input(fs::path const& path)
 	auto tokens = parser::parse(text.cbegin(), text.cend());
 	std::cout << tokens.size() << std::endl;
 }
+
+namespace input {
+
+class TokenVisitor : public boost::static_visitor<>
+{
+	Tokens& m_tokens;
+public:
+	TokenVisitor(Tokens& tokens): m_tokens(tokens) {};
+
+	void operator()(parser::PyExpr const& a)
+	{}
+
+	void operator()(parser::PyCode const& a)
+	{}
+
+	void operator()(parser::NewParagraph const& a)
+	{}
+
+	void operator()(parser::Text const& a)
+	{
+		m_tokens.push_back(std::make_shared<Text>(std::u32string{a.text.begin(), a.text.end()}));
+	}
+
+	void operator()(parser::Block const& a)
+	{}
+};
+
+Tokens convert(parser::Tokens const& in)
+{
+	Tokens r;
+	auto visitor = TokenVisitor{r};
+	for (auto& token: in)
+		boost::apply_visitor(visitor, token);
+	return r;
+}
+
+
+} // namespace input

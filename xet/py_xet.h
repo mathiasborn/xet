@@ -19,22 +19,26 @@
 
 #include "stdafx.h"
 #include <boost/function.hpp>
+#include <pybind11/pybind11.h>
 
-void initializePythonInterpreter();
+namespace py = pybind11;
 
-/*
+void initializePythonPath();
+void setupPythonInterpreter();
+
+
 class PyException: public std::exception
 {
 	std::string m_text;
-	py::handle<> m_exc, m_val, m_tb;
+	py::object m_exc, m_val, m_tb;
 public:
-	PyException();
+	PyException(py::error_already_set&);
 	virtual const char *what() const { return m_text.c_str(); }
-	void PyErr_Restore();
+	void restore();
 };
-*/
 
-//std::string pythonExceptionToText();	// return UTF-8
+
+std::string pythonExceptionToText(py::error_already_set&);	// return UTF-8
 
 template<typename Function>
 auto guarded_python(Function const& func)->decltype(func())
@@ -43,10 +47,10 @@ auto guarded_python(Function const& func)->decltype(func())
 	{
 		return func();
 	}
-	catch (py::error_already_set const & e)
+	catch (py::error_already_set& e)
 	{
-		//auto s = pythonExceptionToText();
-		auto s = e.what();
+		auto s = pythonExceptionToText(e);
+		//auto s = e.what();
 		std::cerr << s << std::endl;
 	}
 	catch (std::exception const& e)

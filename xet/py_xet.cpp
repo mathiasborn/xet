@@ -26,69 +26,67 @@
 
 namespace py = pybind11;
 
-/*
-PyException::PyException()
+
+PyException::PyException(py::error_already_set& e)
 {
 	try
 	{
-		PyObject *exc, *val, *tb;
-		PyErr_Fetch(&exc, &val, &tb);
-		PyErr_NormalizeException(&exc, &val, &tb);
+		e.restore();
+		PyErr_Fetch(&m_exc.ptr(), &m_val.ptr(), &m_tb.ptr());
+		PyErr_NormalizeException(&m_exc.ptr(), &m_val.ptr(), &m_tb.ptr());
+		if (!m_val.ptr()) m_val = py::none();
+		if (!m_tb.ptr()) m_tb = py::none();
 		{
-			m_exc = handle<>(exc);
-			m_val = handle<>(allow_null(val));
-			m_tb = handle<>(allow_null(tb));
-
-			object traceback = import("traceback");
-			object print_exception = traceback.attr("print_exception");
-			object io = import("io");
-			object buf = io.attr("StringIO")();
-			print_exception(m_exc, m_val, m_tb, object(), buf, true);
-			object text = buf.attr("getvalue")();
-			m_text = extract<std::string>(text);
+			py::object traceback = py::module::import("traceback");
+			py::object print_exception = traceback.attr("print_exception");
+			py::object io = py::module::import("io");
+			py::object buf = io.attr("StringIO")();
+			print_exception(m_exc, m_val, m_tb, py::none(), buf, true);
+			py::object text = buf.attr("getvalue")();
+			m_text = text.cast<std::string>();
 		}
 	}
-	catch(error_already_set const &)
+	catch(py::error_already_set&)
 	{
-		PyErr_Clear();
+		//PyErr_Clear();
 		m_text = "Exception during exception handling. Giving up.";
 	}
 }
 
-void PyException::PyErr_Restore()
+void PyException::restore()
 {
-	::PyErr_Restore(m_exc.release(), m_val.release(), m_tb.release());
+	PyErr_Restore(m_exc.release().ptr(), m_val.release().ptr(), m_tb.release().ptr());
 }
 
 
-std::string pythonExceptionToText()
+std::string pythonExceptionToText(py::error_already_set& e)
 {
 	try
 	{
-		PyObject *exc, *val, *tb;
-		PyErr_Fetch(&exc, &val, &tb);
-		PyErr_NormalizeException(&exc, &val, &tb);
-		//if (exc && val && tb)
+		e.restore();
+		py::object m_exc, m_val, m_tb;
+		PyErr_Fetch(&m_exc.ptr(), &m_val.ptr(), &m_tb.ptr());
+		PyErr_NormalizeException(&m_exc.ptr(), &m_val.ptr(), &m_tb.ptr());
+		if (!m_val.ptr()) m_val = py::none();
+		if (!m_tb.ptr()) m_tb = py::none();
 		{
-			handle<> hexc(exc), hval(allow_null(val)), htb(allow_null(tb));
-
-			object traceback = import("traceback");
-			object print_exception = traceback.attr("print_exception");
-			object io = import("io");
-			object buf = io.attr("StringIO")();
-			print_exception(hexc, hval, htb, object(), buf, true);
-			object text = buf.attr("getvalue")();
-			return extract<std::string>(text);
+			py::object traceback = py::module::import("traceback");
+			py::object print_exception = traceback.attr("print_exception");
+			py::object io = py::module::import("io");
+			py::object buf = io.attr("StringIO")();
+			print_exception(m_exc, m_val, m_tb, py::none(), buf, true);
+			py::object text = buf.attr("getvalue")();
+			return text.cast<std::string>();
 		}
-		return "Python Exception caught.";
 	}
-	catch(error_already_set const &)
+	catch(py::error_already_set&)
 	{
-		PyErr_Clear();
+		//PyErr_Clear();
 		return "Exception during exception handling. Giving up.";
 	}
 }
 
+/*
 struct u32string_to_python_str
 {
 	static PyObject* convert(std::u32string const& s)
@@ -206,7 +204,7 @@ PYBIND11_EMBEDDED_MODULE(xet, m)
 }
 
 
-void initializePythonInterpreter()
+void initializePythonPath()
 {
 	using namespace std;
 	fs::path appDir = platform::appFileName().parent_path();
@@ -221,15 +219,10 @@ void initializePythonInterpreter()
 	else
 	{
 	}
-/*
-	// NoProxy=true is default for std::string elements
-	class_<std::vector<std::string>>("string_vector")
-		.def(vector_indexing_suite<std::vector<std::string>>());
+}
 
-	// This only works with NoProxy=true?
-	class_<std::vector<std::u32string>>("u32string_vector")
-		.def(vector_indexing_suite<std::vector<std::u32string>, true>());
-*/
+void setupPythonInterpreter()
+{
 	guarded_python([&]()
 	{
 		py::object sys_module = py::module::import("sys");
@@ -241,6 +234,5 @@ void initializePythonInterpreter()
 		py::object autostart_module = py::module::import("xet_test");
 		autostart_module.attr("run")();
 	});
-
 }
 
