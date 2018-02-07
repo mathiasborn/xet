@@ -144,7 +144,7 @@ XetParser<Iterator, Skipper>::XetParser() : XetParser::base_type(start, "start")
 	start = tokens.alias();
 	py_identifier = char_(L"A-Za-z_") >> *char_(L"0-9A-Za-z_");
 
-	py_expr = lexeme[omit['\\'] >> raw[+py_identifier]] >> block | lexeme[omit['\\'] >> no_skip[_py_expr]] >> block;
+	py_expr = lexeme[omit['\\'] >> raw[+py_identifier]] >> *block | lexeme[omit['\\'] >> no_skip[_py_expr]] >> *block;
 	
 	py_code_beg = lit("\\py") > '{';
 	//qi::on_error<qi::fail>(py_code_beg, std::cerr << ph::val("Expected '{' at offset ") << (qi::_3 - qi::_1) << " in \"" << std::string(qi::_1, qi::_2) << '"' << std::endl);
@@ -163,7 +163,7 @@ XetParser<Iterator, Skipper>::XetParser() : XetParser::base_type(start, "start")
 
 	tokens = *(py_code | py_expr | new_paragraph | block | text);
 
-	block = '{' >> *(py_expr | new_paragraph | block | text) >> '}';
+	block = '{' >> *(py_expr | new_paragraph | text) >> '}';
 
 	BOOST_SPIRIT_DEBUG_NODE(py_code_beg);
 	//BOOST_SPIRIT_DEBUG_NODE(py_code_end);

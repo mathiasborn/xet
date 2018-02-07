@@ -50,16 +50,19 @@ public:
 	void operator()(parser::PyCode const& a)
 	{}
 
-	void operator()(parser::NewParagraph const& a)
-	{}
+	void operator()(parser::NewParagraph const&)
+	{
+		m_tokens.emplace_back(
+			Token(std::in_place_type_t<ParagraphSeperator>())
+		);
+	}
 
 	void operator()(parser::Text const& a)
 	{
-		m_tokens.push_back(std::make_shared<Text>(std::u32string{a.text.begin(), a.text.end()}));
+		m_tokens.emplace_back(
+			Token(std::in_place_type_t<Text>(), std::u32string{a.text.begin(), a.text.end()})
+		);
 	}
-
-	void operator()(parser::Block const& a)
-	{}
 };
 
 Tokens convert(parser::Tokens const& in)

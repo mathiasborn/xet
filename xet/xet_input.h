@@ -5,6 +5,8 @@
 #include <memory>
 #include <variant>
 #include <boost/filesystem.hpp>
+#include <boost/smart_ptr/intrusive_ptr.hpp>
+#include <boost/smart_ptr/intrusive_ref_counter.hpp>
 #include "interfaces.h"
 #include "xet_parser.h"
 
@@ -12,28 +14,7 @@ namespace input {
 
 // input stream
 
-class Token
-{
-public:
-	virtual ~Token() {};
-};
-
-typedef std::shared_ptr<Token> PToken;
-typedef std::vector<PToken> Tokens;
-
-class Marker : public Token {};
-
-class Text : public Token
-{
-public:
-	Text() {};
-	Text(std::u32string const& text) : m_text(text) {};
-
-	virtual std::u32string const& text() const { return {}; }
-private:
-	std::u32string m_text;
-};
-
+/*
 class Callable : public Token
 {
 public:
@@ -46,15 +27,32 @@ protected:
 private:
 	Tokens m_result;
 };
+*/
 
-class Actor : public Token
+class Actor;
+typedef boost::intrusive_ptr<Actor> PActor;
+
+
+class Text
 {
 public:
-	virtual void addedToPage(xet::PPage&) {};
-	virtual void addedToTypeSetter() {};
+	Text() {};
+	Text(std::u32string const& text) : m_text(text) {};
+
+	virtual std::u32string const& text() const { return m_text; }
+private:
+	std::u32string m_text;
 };
 
-class Glue : public Token
+class ActiveToken
+{
+public:
+	ActiveToken(PActor actor): m_actor(actor) {};
+protected:
+	PActor m_actor;
+};
+
+class Glue
 {
 
 private:
@@ -63,7 +61,7 @@ private:
 	xet::Size m_shrinkability;
 };
 
-class Penalty : public Token
+class Penalty
 {
 public:
 	static constexpr int pinf = +1000;
@@ -73,6 +71,19 @@ private:
 	xet::Size m_width;
 };
 
+class ParagraphSeperator {};
+
+typedef std::variant<ParagraphSeperator, Penalty, Glue, Text, ActiveToken> Token;
+typedef std::vector<Token> Tokens;
+
+
+class Actor : public boost::intrusive_ref_counter<Actor, boost::thread_unsafe_counter>
+{
+public:
+	virtual ~Actor() {};
+	virtual void addedToPage(xet::PPage&) {};
+	virtual Tokens addedToTypeSetter() { return {}; }
+};
 
 /*
 class Text: public Token

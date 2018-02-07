@@ -36,8 +36,7 @@ typedef boost::variant<
 	boost::recursive_wrapper<PyExpr>,
 	PyCode,
 	NewParagraph,
-	Text,
-	boost::recursive_wrapper<Block>
+	Text
 > Token;
 typedef std::vector<Token> Tokens;
 
@@ -49,7 +48,7 @@ struct Block
 struct PyExpr
 {
 	TextRange text;
-	Block block;
+	std::vector<Tokens> blocks;
 };
 
 std::ostream& operator<<(std::ostream& s, TextRange const& text);
@@ -73,7 +72,8 @@ template<> struct is_container<parser::PyCode const>: mpl::false_ {};
 BOOST_FUSION_ADAPT_STRUCT(
 	parser::PyExpr,
 	(parser::TextRange, text)
-	(parser::Block, block)
+	(std::vector<parser::Tokens>, blocks)
+	//(parser::Block, block)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -107,7 +107,7 @@ struct XetParser: qi::grammar<Iterator, Tokens(), Skipper>
 	qi::rule<Iterator, Text(), Skipper> text;
 	//qi::rule<Iterator, Token(), Skipper> token;
 	qi::rule<Iterator, Tokens(), Skipper> tokens;
-	qi::rule<Iterator, Block(), Skipper> block;
+	qi::rule<Iterator, Tokens(), Skipper> block;
 	qi::rule<Iterator, Tokens(), Skipper> start;
 };
 
