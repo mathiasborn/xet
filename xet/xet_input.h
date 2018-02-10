@@ -94,7 +94,7 @@ std::vector<std::u32string> m_parts;
 };
 */
 
-Tokens convert(parser::Tokens const&);
+Tokens convert(parser::Tokens const&, fs::path const& fileName);
 
 } // namespace input
 

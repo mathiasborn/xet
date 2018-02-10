@@ -10,10 +10,11 @@
 
 #include "py_parser.h"
 #include "xet_parser_skipper.h"
+#include "xet_line_pos_iterator.h"
 
 namespace parser {
-
-typedef boost::iterator_range<std::u32string::const_iterator> TextRange;
+typedef boost::iterator_range<line_pos_iterator<std::u32string::const_iterator>> TextRange;
+//typedef boost::iterator_range<std::u32string::const_iterator> TextRange;
 
 struct PyCode
 {

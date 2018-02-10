@@ -7,9 +7,12 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include <pybind11/pybind11.h>
 
 #include "xet_input.h"
 #include "xet_parser.h"
+
+namespace py = pybind11;
 
 std::u32string loadUTF8TextFile(fs::path const& path)
 {
@@ -41,14 +44,27 @@ namespace input {
 class TokenVisitor : public boost::static_visitor<>
 {
 	Tokens& m_tokens;
+	std::wstring m_fileName;
+	py::object m_compile, m_exec, m_eval;
 public:
-	TokenVisitor(Tokens& tokens): m_tokens(tokens) {};
+	TokenVisitor(Tokens& tokens, fs::path const& fileName): m_tokens(tokens), m_fileName{fileName.wstring()}
+	{
+		auto builtins = py::module::import("builtins");
+		m_compile = builtins.attr("compile");
+		m_exec = builtins.attr("exec");
+		m_eval = builtins.attr("eval");
+	};
 
 	void operator()(parser::PyExpr const& a)
 	{}
 
 	void operator()(parser::PyCode const& a)
-	{}
+	{
+		// fixme: add newlines at the start to get line numbers right
+		auto src = std::u32string{a.text.begin(), a.text.end()};
+		auto code = m_compile(src, m_fileName, "exec");
+		m_exec(code);
+	}
 
 	void operator()(parser::NewParagraph const&)
 	{
@@ -65,10 +81,10 @@ public:
 	}
 };
 
-Tokens convert(parser::Tokens const& in)
+Tokens convert(parser::Tokens const& in, fs::path const& fileName)
 {
 	Tokens r;
-	auto visitor = TokenVisitor{r};
+	auto visitor = TokenVisitor{r, fileName };
 	for (auto& token: in)
 		boost::apply_visitor(visitor, token);
 	return r;

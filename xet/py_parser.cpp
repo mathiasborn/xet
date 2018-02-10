@@ -8,6 +8,7 @@
 
 #include "py_parser.h"
 #include "py_literal_parser.h"
+#include "xet_line_pos_iterator.h"
 
 namespace qi = boost::spirit::qi;
 using namespace boost::spirit;
@@ -266,12 +267,13 @@ bool parsePythonExpression(std::u32string::const_iterator& first, std::u32string
 	return r;
 }
 
-/*
+
 // This is not really called. Its only purpose is to
 // instantiate the method of the grammar.
-static void instantiate_parser()
+void instantiate_py_expr_parser()
 {
-	typedef std::u32string::const_iterator Iterator;
-	PyExprParser<Iterator, parser::XetSkipper<Iterator>> g;
+	//typedef std::u32string::const_iterator Iterator;
+	typedef line_pos_iterator<std::u32string::const_iterator> Iterator;
+	PyExprParser<Iterator> g;
 }
-*/
+

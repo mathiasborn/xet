@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "xet_parser_skipper.h"
+#include "xet_line_pos_iterator.h"
 #include <boost/spirit/include/support.hpp>
 
 namespace qi = boost::spirit::qi;
@@ -22,7 +23,8 @@ XetSkipper<Iterator>::XetSkipper() : XetSkipper::base_type(skip)
 // instantiate the method of the grammar.
 void instantiate_xet_parser_skipper()
 {
-	typedef std::u32string::const_iterator iterator_type;
+	//typedef std::u32string::const_iterator iterator_type;
+	typedef line_pos_iterator<std::u32string::const_iterator> iterator_type;
 	XetSkipper<iterator_type> g;
 }
 

@@ -7,6 +7,7 @@
 #include <boost/spirit/include/phoenix.hpp>
 
 #include "unicode_string_support.h"
+#include "xet_line_pos_iterator.h"
 #include "xet_parser.h"
 #include "xet_parser_skipper.h"
 
@@ -187,11 +188,13 @@ Tokens parse(std::u32string::const_iterator& first, std::u32string::const_iterat
 	std::cout << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" << std::endl;// << "<start>" << std::endl;
 #	endif	
 	
-	typedef std::u32string::const_iterator Iterator;
+	typedef line_pos_iterator<std::u32string::const_iterator> Iterator;
 	XetParser<Iterator, XetSkipper<Iterator>> parser;
 
 	Tokens result;
-	auto r = qi::phrase_parse(first, last, parser, XetSkipper<Iterator>(), qi::skip_flag::dont_postskip, result);
+	auto lpFirst = Iterator{first, first};
+	auto lpLast = Iterator{first, last};
+	auto r = qi::phrase_parse(lpFirst, lpLast, parser, XetSkipper<Iterator>(), qi::skip_flag::dont_postskip, result);
 
 #	ifdef BOOST_SPIRIT_DEBUG
 	//std::cout << "</start>" << std::endl;
