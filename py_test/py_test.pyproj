@@ -5,13 +5,14 @@
     <ProjectGuid>c8fd8554-06a6-4731-b3da-faff3bde02bd</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartupFile>py_test.py</StartupFile>
-    <SearchPath>
-    </SearchPath>
+    <SearchPath>..\x64\Debug</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>py_test</Name>
     <RootNamespace>py_test</RootNamespace>
     <InterpreterId>Global|VisualStudio|cpp 3.6</InterpreterId>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <EnableNativeCodeDebugging>True</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>

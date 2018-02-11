@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "py_literal_parser.h"
+#include "xet_line_pos_iterator.h"
 
 using namespace boost::spirit;
 
@@ -60,7 +61,8 @@ PyNumberParser<Iterator>::PyNumberParser(): PyNumberParser::base_type(number, "n
 // instantiate the method of the grammar.
 void instantiate_parser()
 {
-	typedef std::u32string::const_iterator iterator_type;
+	typedef line_pos_iterator<std::u32string::const_iterator> iterator_type;
+	//typedef std::u32string::const_iterator iterator_type;
 	PyStrParser<iterator_type> g1;
 	PyNumberParser<iterator_type> g2;
 }

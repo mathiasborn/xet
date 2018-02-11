@@ -113,5 +113,5 @@ struct PyExprParser: qi::grammar<Iterator, boost::iterator_range<Iterator>()>, p
 };
 
 
-bool parsePythonExpression(std::u32string::const_iterator& first, std::u32string::const_iterator last, boost::iterator_range<std::u32string::const_iterator>& result);
+//bool parsePythonExpression(std::u32string::const_iterator& first, std::u32string::const_iterator last, boost::iterator_range<std::u32string::const_iterator>& result);
 

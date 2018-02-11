@@ -246,6 +246,7 @@ template <typename Iterator> PyExprParser<Iterator>::PyExprParser(): PyExprParse
 }
 
 
+/*
 bool parsePythonExpression(std::u32string::const_iterator& first, std::u32string::const_iterator last, boost::iterator_range<std::u32string::const_iterator>& result)
 {
 #	ifdef BOOST_SPIRIT_DEBUG
@@ -266,6 +267,7 @@ bool parsePythonExpression(std::u32string::const_iterator& first, std::u32string
 
 	return r;
 }
+*/
 
 
 // This is not really called. Its only purpose is to

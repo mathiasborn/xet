@@ -188,7 +188,7 @@ public:
 	};
 };
 
-PYBIND11_EMBEDDED_MODULE(xet, m)
+PYBIND11_MODULE(xet, m)
 {
 	using namespace py::literals;
 		
