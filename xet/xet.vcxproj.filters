@@ -57,6 +57,12 @@
     <ClInclude Include="xet_parser_skipper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="py_cs_parser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xet_document.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -90,6 +96,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="xet_parser_skipper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="py_cs_parser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="xet_document.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

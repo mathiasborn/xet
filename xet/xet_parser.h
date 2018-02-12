@@ -9,11 +9,12 @@
 #include <boost/fusion/include/vector.hpp>
 
 #include "py_parser.h"
+#include "py_cs_parser.h"
 #include "xet_parser_skipper.h"
 #include "xet_line_pos_iterator.h"
 
 namespace parser {
-typedef boost::iterator_range<line_pos_iterator<std::u32string::const_iterator>> TextRange;
+typedef LinePosTextRange TextRange;
 //typedef boost::iterator_range<std::u32string::const_iterator> TextRange;
 
 struct PyCode
@@ -48,7 +49,7 @@ struct Block
 
 struct PyExpr
 {
-	TextRange text;
+	PyControlSequence cs;
 	std::vector<Tokens> blocks;
 };
 
@@ -72,9 +73,8 @@ template<> struct is_container<parser::PyCode const>: mpl::false_ {};
 
 BOOST_FUSION_ADAPT_STRUCT(
 	parser::PyExpr,
-	(parser::TextRange, text)
+	(parser::PyControlSequence, cs)
 	(std::vector<parser::Tokens>, blocks)
-	//(parser::Block, block)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -101,7 +101,8 @@ struct XetParser: qi::grammar<Iterator, Tokens(), Skipper>
 
 	qi::rule<Iterator, void(), Skipper> py_code_beg;
 	qi::rule<Iterator, void()> py_code_end, py_identifier, new_paragraph_pattern;
-	PyExprParser<Iterator> _py_expr;
+	PyCSParser cs_parser;
+	//PyExprParser<Iterator> _py_expr;
 	qi::rule<Iterator, PyExpr(), Skipper> py_expr;
 	qi::rule<Iterator, PyCode(), Skipper> py_code;
 	qi::rule<Iterator, NewParagraph(), Skipper> new_paragraph;

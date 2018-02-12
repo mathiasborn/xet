@@ -5,6 +5,7 @@
 
 #include <boost/spirit/include/support.hpp>
 #include <boost/spirit/include/phoenix.hpp>
+#include <boost/optional/optional_io.hpp>
 
 #include "unicode_string_support.h"
 #include "xet_line_pos_iterator.h"
@@ -100,7 +101,7 @@ std::ostream& operator<<(std::ostream& s, PyCode const& o)
 
 std::ostream& operator<<(std::ostream& s, PyExpr const& o)
 {
-	s << "PyExpr: \"" << o.text << '"';
+	s << "PyExpr: \"" << o.cs.name << o.cs.args << '"';
 	return s;
 }
 
@@ -145,7 +146,8 @@ XetParser<Iterator, Skipper>::XetParser() : XetParser::base_type(start, "start")
 	start = tokens.alias();
 	py_identifier = char_(L"A-Za-z_") >> *char_(L"0-9A-Za-z_");
 
-	py_expr = lexeme[omit['\\'] >> raw[+py_identifier]] >> *block | lexeme[omit['\\'] >> no_skip[_py_expr]] >> *block;
+	//py_expr = lexeme[omit['\\'] >> raw[+py_identifier]] >> *block | lexeme[omit['\\'] >> no_skip[_py_expr]] >> *block;
+	py_expr = cs_parser >> *block | cs_parser >> *block;
 	
 	py_code_beg = lit("\\py") > '{';
 	//qi::on_error<qi::fail>(py_code_beg, std::cerr << ph::val("Expected '{' at offset ") << (qi::_3 - qi::_1) << " in \"" << std::string(qi::_1, qi::_2) << '"' << std::endl);

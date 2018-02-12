@@ -20,7 +20,8 @@ template <typename Iterator, typename Skipper> PyCommonParser<Iterator, Skipper>
 	using qi::int_;
 	using qi::no_case;
 
-	NAME = lexeme[char_(L"A-Za-z_") >> *char_(L"0-9A-Za-z_")];
+	NS_NAME = char_(L"A-Za-z_") >> *char_(L"0-9A-Za-z_");
+	NAME = lexeme[NS_NAME];
 	NEWLINE = eol;
 	ASYNC = "async";
 	AWAIT = "await";

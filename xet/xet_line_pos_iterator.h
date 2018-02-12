@@ -31,6 +31,13 @@ private:
 	std::size_t m_line{1}; // The line position.
 };
 
+typedef line_pos_iterator<std::u32string::const_iterator> LinePosIterator;
+typedef boost::iterator_range<LinePosIterator> LinePosTextRange;
+
+namespace boost::spirit::traits {
+	template<> struct is_container<LinePosTextRange> : mpl::false_ {};
+}
+
 
 template <class Iterator>
 line_pos_iterator<Iterator>::line_pos_iterator(Iterator begin, Iterator base): line_pos_iterator::iterator_adaptor_(base), m_line(1), m_begin(begin)

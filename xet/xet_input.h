@@ -7,8 +7,11 @@
 #include <boost/filesystem.hpp>
 #include <boost/smart_ptr/intrusive_ptr.hpp>
 #include <boost/smart_ptr/intrusive_ref_counter.hpp>
+#include <pybind11/pybind11.h>
 #include "interfaces.h"
 #include "xet_parser.h"
+
+namespace py = pybind11;
 
 namespace input {
 
@@ -94,7 +97,7 @@ std::vector<std::u32string> m_parts;
 };
 */
 
-Tokens convert(parser::Tokens const&, fs::path const& fileName);
+Tokens convert(parser::Tokens const&, fs::path const& fileName, py::dict& env);
 
 } // namespace input
 

@@ -122,7 +122,11 @@ public:
 	GETV(height)
 };
 
+class ControlSequence
+{
 
+
+typedef std::shared_ptr<ControlSequence> PControlSequence;
 
 } // namespace xet
 

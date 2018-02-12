@@ -15,6 +15,7 @@ struct PyCommonParser
 
 	PyStrParser<Iterator> STRING;
 	PyNumberParser<Iterator> NUMBER;
+	qi::rule<Iterator, void()> NS_NAME;
 	Rule NAME, NEWLINE, ASYNC, INDENT, DEDENT, AWAIT;
 	Rule single_input;
 	Rule file_input;

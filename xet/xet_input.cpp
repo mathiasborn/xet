@@ -45,25 +45,30 @@ class TokenVisitor : public boost::static_visitor<>
 {
 	Tokens& m_tokens;
 	std::wstring m_fileName;
-	py::object m_compile, m_exec, m_eval;
+	py::dict& m_env;
+	py::object m_compile, m_exec, m_eval, m_argsConverter;
 public:
-	TokenVisitor(Tokens& tokens, fs::path const& fileName): m_tokens(tokens), m_fileName{fileName.wstring()}
+	TokenVisitor(Tokens& tokens, fs::path const& fileName, py::dict& env): m_tokens(tokens), m_fileName{fileName.wstring()}, m_env{env}
 	{
 		auto builtins = py::module::import("builtins");
 		m_compile = builtins.attr("compile");
 		m_exec = builtins.attr("exec");
 		m_eval = builtins.attr("eval");
+		m_argsConverter = m_compile("lambda **kwds: kwds", "eval");
 	};
 
 	void operator()(parser::PyExpr const& a)
-	{}
+	{
+		auto name = std::u32string{ a.cs.name.begin(), a.cs.name.end() };
+		auto code = m_compile(src, m_fileName, "eval");
+		m_eval(code, m_env);
+	}
 
 	void operator()(parser::PyCode const& a)
 	{
-		// fixme: add newlines at the start to get line numbers right
-		auto src = std::u32string{a.text.begin(), a.text.end()};
+		auto src = std::u32string{ a.text.begin().line()-1, U'\n' } + std::u32string{a.text.begin(), a.text.end()};
 		auto code = m_compile(src, m_fileName, "exec");
-		m_exec(code);
+		m_exec(code, m_env);
 	}
 
 	void operator()(parser::NewParagraph const&)
@@ -81,10 +86,10 @@ public:
 	}
 };
 
-Tokens convert(parser::Tokens const& in, fs::path const& fileName)
+Tokens convert(parser::Tokens const& in, fs::path const& fileName, py::dict& env)
 {
 	Tokens r;
-	auto visitor = TokenVisitor{r, fileName };
+	auto visitor = TokenVisitor{r, fileName, env };
 	for (auto& token: in)
 		boost::apply_visitor(visitor, token);
 	return r;
