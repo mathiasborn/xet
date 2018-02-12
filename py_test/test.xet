@@ -1,0 +1,50 @@
+\py{
+import xet
+from xet import cs, mm, cm
+
+
+left = 0
+center = 1
+right = 2
+
+@cs
+class section(xet.ControlSeq):
+	pass
+
+@cs('frame')
+class CSFrame(xet.ControlSeq):
+	def __init__(self, pos=center, width=0, **kwds):
+		super().__init__(**kwds)
+
+@cs('logo')
+def CSLogo():
+	return 'xet'
+
+
+
+
+
+}
+
+# The next input creates the first real contents, which creates a new page, because no page exists yet
+
+\section{The first section}
+
+foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar
+foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar
+foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar
+foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar
+\ref(fig.test1) hallo
+
+
+\frame(pos=center, width=5*xet.cm) {
+This is some text in the center of the page.
+}
+
+#\headframe(pos=center, width=5*xet.cm) {$V_{GS}$} {
+#This is some text in the center of the page.
+#}
+
+
+#\group{\fs(24) blah blah}
+
