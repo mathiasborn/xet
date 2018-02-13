@@ -12,12 +12,16 @@ class Document
 {
 	struct ControlSequence
 	{
-		std::u32string m_name;
-
+		py::object callable;
 	};
 	typedef std::unordered_map<std::u32string, ControlSequence> ControlSequences;
+
+	Document();
+	ControlSequences& controlSequences() { return m_controlSequences; }
+	py::dict& environment() { return m_environment; }
 private:
 	ControlSequences m_controlSequences;
+	py::dict m_environment;
 };
 
 }	// namespace xet

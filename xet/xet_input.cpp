@@ -9,10 +9,14 @@
 #include <boost/filesystem/fstream.hpp>
 #include <pybind11/pybind11.h>
 
+#include "unicode_string_support.h"
 #include "xet_input.h"
-#include "xet_parser.h"
+//#include "xet_parser.h"
+//#include "xet_input_error.h"
+
 
 namespace py = pybind11;
+using namespace std::string_literals;
 
 std::u32string loadUTF8TextFile(fs::path const& path)
 {
@@ -31,6 +35,7 @@ std::u32string loadUTF8TextFile(fs::path const& path)
 	return std::u32string{Conv(sbuf.cbegin()), Conv(sbuf.cend())};
 }
 
+/*
 void test_xet_input(fs::path const& path)
 {
 	auto text = loadUTF8TextFile(path);
@@ -38,37 +43,52 @@ void test_xet_input(fs::path const& path)
 	auto tokens = parser::parse(text.cbegin(), text.cend());
 	std::cout << tokens.size() << std::endl;
 }
+*/
 
 namespace input {
 
+/*
 class TokenVisitor : public boost::static_visitor<>
 {
 	Tokens& m_tokens;
-	std::wstring m_fileName;
-	py::dict& m_env;
-	py::object m_compile, m_exec, m_eval, m_argsConverter;
+	std::u32string m_fileName;
+	xet::Document& m_doc;
+	py::object m_compile, m_exec, m_eval;
+	py::dict m_argsConverter;
 public:
-	TokenVisitor(Tokens& tokens, fs::path const& fileName, py::dict& env): m_tokens(tokens), m_fileName{fileName.wstring()}, m_env{env}
+	TokenVisitor(Tokens& tokens, fs::path const& fileName, xet::Document& doc): m_tokens(tokens), m_fileName{uts::toUtf32(fileName.wstring())}, m_doc{doc}
 	{
 		auto builtins = py::module::import("builtins");
 		m_compile = builtins.attr("compile");
 		m_exec = builtins.attr("exec");
 		m_eval = builtins.attr("eval");
-		m_argsConverter = m_compile("lambda **kwds: kwds", "eval");
+		m_argsConverter["___f___"] = m_eval("lambda **kwds: kwds");
 	};
 
 	void operator()(parser::PyExpr const& a)
 	{
+/ *
 		auto name = std::u32string{ a.cs.name.begin(), a.cs.name.end() };
-		auto code = m_compile(src, m_fileName, "eval");
-		m_eval(code, m_env);
+		//auto src = name + a.cs.args ? std::u32string{ a.cs.args.begin(), a.cs.args.end() } : U"()"s;
+		auto csi = m_doc.controlSequences().find(name);
+		if (csi == m_doc.controlSequences().end())
+			throw Error(m_fileName, a.cs.name.begin(), U"Unknown control sequence '"s + name + U"'.");
+		py::object r;
+		if (a.cs.args)
+		{
+			auto args_dict = m_eval(U"___f___"s + std::u32string{ a.cs.args.begin(), a.cs.args.end() }, m_doc.environment(), m_argsConverter);
+			r = csi->second.callable(**args_dict);
+		}
+		else
+			r = csi->second.callable();
+* /
 	}
 
 	void operator()(parser::PyCode const& a)
 	{
 		auto src = std::u32string{ a.text.begin().line()-1, U'\n' } + std::u32string{a.text.begin(), a.text.end()};
 		auto code = m_compile(src, m_fileName, "exec");
-		m_exec(code, m_env);
+		m_exec(code, m_doc.environment());
 	}
 
 	void operator()(parser::NewParagraph const&)
@@ -85,15 +105,16 @@ public:
 		);
 	}
 };
-
-Tokens convert(parser::Tokens const& in, fs::path const& fileName, py::dict& env)
+*/
+/*
+Tokens convert(parser::Tokens const& in, fs::path const& fileName, xet::Document& doc)
 {
 	Tokens r;
-	auto visitor = TokenVisitor{r, fileName, env };
+	auto visitor = TokenVisitor{r, fileName, doc};
 	for (auto& token: in)
 		boost::apply_visitor(visitor, token);
 	return r;
 }
-
+*/
 
 } // namespace input

@@ -3,6 +3,7 @@
 
 #include <boost/iterator/iterator_adaptor.hpp>
 #include <boost/range/iterator_range.hpp>
+#include <boost/spirit/home/support/container.hpp>
 
 template <class Iterator>
 class line_pos_iterator: public boost::iterator_adaptor<

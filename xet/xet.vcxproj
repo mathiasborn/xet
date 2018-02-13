@@ -96,7 +96,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);BOOST_ALL_DYN_LINK;_HAS_AUTO_PTR_ETC=1;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(pdfwriter)/x86-Debug/include;$(pybind11)/include;$(python32)\Include;$(boost);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <AdditionalOptions>-Bv %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -174,6 +175,7 @@
     <ClInclude Include="unicode_string_support.h" />
     <ClInclude Include="xet_document.h" />
     <ClInclude Include="xet_input.h" />
+    <ClInclude Include="xet_input_error.h" />
     <ClInclude Include="xet_line_pos_iterator.h" />
     <ClInclude Include="xet_parser.h" />
     <ClInclude Include="xet_parser_skipper.h" />
@@ -195,6 +197,7 @@
     <ClCompile Include="xet.cpp" />
     <ClCompile Include="xet_document.cpp" />
     <ClCompile Include="xet_input.cpp" />
+    <ClCompile Include="xet_input_error.cpp" />
     <ClCompile Include="xet_parser.cpp" />
     <ClCompile Include="xet_parser_skipper.cpp" />
   </ItemGroup>

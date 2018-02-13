@@ -10,6 +10,7 @@
 #include <pybind11/pybind11.h>
 #include "interfaces.h"
 #include "xet_parser.h"
+#include "xet_document.h"
 
 namespace py = pybind11;
 
@@ -97,7 +98,7 @@ std::vector<std::u32string> m_parts;
 };
 */
 
-Tokens convert(parser::Tokens const&, fs::path const& fileName, py::dict& env);
+Tokens convert(parser::Tokens const&, fs::path const& fileName, xet::Document& doc);
 
 } // namespace input
 
