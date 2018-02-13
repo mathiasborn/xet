@@ -96,8 +96,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);BOOST_ALL_DYN_LINK;_HAS_AUTO_PTR_ETC=1;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(pdfwriter)/x86-Debug/include;$(pybind11)/include;$(python32)\Include;$(boost);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp14</LanguageStandard>
-      <AdditionalOptions>-Bv %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <CppLanguageStandard>c++1y</CppLanguageStandard>
+      <AdditionalOptions>-Zm227 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

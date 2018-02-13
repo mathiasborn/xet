@@ -28,7 +28,7 @@ private:
 	void increment();
 	void decrement();
 
-	Iterator m_begin{0};
+	Iterator m_begin;
 	std::size_t m_line{1}; // The line position.
 };
 

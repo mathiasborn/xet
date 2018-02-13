@@ -18,6 +18,7 @@
 #pragma once
 
 #include "stdafx.h"
+#include "unicode_string_support.h"
 #include <boost/function.hpp>
 #include <pybind11/pybind11.h>
 
@@ -79,3 +80,49 @@ auto std_python(Function const& func)->decltype(func())
 }
 */
 
+namespace pybind11::detail {
+template<> struct type_caster<fs::path>
+{
+public:
+	/**
+	* This macro establishes the name 'fs::path' in
+	* function signatures and declares a local variable
+	* 'value' of type fs::path
+	*/
+	PYBIND11_TYPE_CASTER(fs::path, _("fs::path"));
+
+	/**
+	* Conversion part 1 (Python->C++): convert a PyObject into a fs::path
+	* instance or return false upon failure. The second argument
+	* indicates whether implicit conversions should be applied.
+	*/
+	bool load(handle src, bool)
+	{
+		auto o = py::reinterpret_borrow<py::object>(src);
+		try
+		{
+			auto ps = o.cast<py::str>();
+			auto s = ps.cast<std::u32string>();
+			value = uts::toPath(s);
+		}
+		catch(py::cast_error const&)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	* Conversion part 2 (C++ -> Python): convert an fs::path instance into
+	* a Python object. The second and third arguments are used to
+	* indicate the return value policy and parent object (for
+	* ``return_value_policy::reference_internal``) and are generally
+	* ignored by implicit casters.
+	*/
+	static handle cast(fs::path const& src, return_value_policy /* policy */, handle /* parent */)
+	{
+		auto r = py::cast(uts::toUtf32(src));
+		return r.release();
+	}
+};
+} // namespace pybind11::detail

@@ -124,7 +124,7 @@ public:
 
 class ControlSequence
 {
-
+};
 
 typedef std::shared_ptr<ControlSequence> PControlSequence;
 

@@ -59,4 +59,22 @@ std::u32string toUtf32(char const* s, size_t size)
 	return r;
 }
 
+std::wstring toWString(std::u32string const& s)
+{
+	auto r = std::wstring{};
+	typedef boost::u32_to_u16_iterator<std::u32string::const_iterator> Conv;
+	r.assign(Conv(s.begin()), Conv(s.end()));
+	return r;
+}
+
+fs::path toPath(std::u32string const& s)
+{
+	return fs::path{toWString(s)};
+}
+
+std::u32string toUtf32(fs::path const& path)
+{
+	return toUtf32(path.wstring());
+}
+
 };	// namespace uts

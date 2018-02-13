@@ -17,12 +17,13 @@
 ***************************************************************************/
 
 #include "stdafx.h"
+#include <boost/filesystem.hpp>
+#include <pybind11/pybind11.h>
+#include <fcntl.h>
 #include "py_xet.h"
 #include "unicode_string_support.h"
 #include "platform.h"
-#include <boost/filesystem.hpp>
-#include <pybind11/embed.h>
-#include <fcntl.h>
+#include "xet_document.h"
 
 namespace py = pybind11;
 
@@ -86,98 +87,6 @@ std::string pythonExceptionToText(py::error_already_set& e)
 	}
 }
 
-/*
-struct u32string_to_python_str
-{
-	static PyObject* convert(std::u32string const& s)
-	{
-		auto u8 = uts::toUtf8(s);
-		return PyUnicode_DecodeUTF8(u8.data(), u8.length(), nullptr);
-	}
-};
-
-struct u32string_from_python_str
-{
-	u32string_from_python_str()
-	{
-		boost::python::converter::registry::push_back(
-			&convertible,
-			&construct,
-			boost::python::type_id<std::u32string>()
-		);
-	}
-
-	// Determine if obj_ptr can be converted in a std::u32string
-	static void* convertible(PyObject* obj_ptr)
-	{
-		if (!PyUnicode_Check(obj_ptr)) return 0;
-		return obj_ptr;
-	}
-
-	// Convert obj_ptr into a std::u32string
-	static void construct(
-		PyObject* obj_ptr,
-		boost::python::converter::rvalue_from_python_stage1_data* data)
-	{
-		// Extract the character data from the python string
-		Py_ssize_t size;
-		char* s = PyUnicode_AsUTF8AndSize(obj_ptr, &size); // The caller is not responsible for deallocating the buffer s.
-
-		// Verify that obj_ptr is a string (should be ensured by convertible())
-		assert(s);
-
-		auto value = uts::toUtf32(s, size);
-
-		// Grab pointer to memory into which to construct the new QString
-		void* storage = ( (boost::python::converter::rvalue_from_python_storage<std::u32string>*)data )->storage.bytes;
-
-		// in-place construct the new std::u32string using the character data extraced from the python object
-		new (storage) std::u32string{value};
-
-		// Stash the memory chunk pointer for later use by boost.python
-		data->convertible = storage;
-	}
-};
-
-template<typename T>
-struct optional_to_python
-{
-	static PyObject* convert(boost::optional<T> const& o)
-	{
-		return incref(o ? object(*o).ptr() : Py_None);
-	}
-};
-
-
-void InitializeConverters()
-{
-	using namespace boost::python;
-
-	to_python_converter<std::u32string, u32string_to_python_str>();
-	u32string_from_python_str();
-}
-
-class TestClass
-{
-public:
-	TestClass(int z, int64_t width, tuple adjustment)
-	{
-		std::cout << "z=" << z << " width=" << width << " len(adjustment)=" << len(adjustment) <<  std::endl;
-	};
-};
-
-BOOST_PYTHON_MODULE(xet)
-{
-	class_<TestClass>("TestClass",
-		init<int, int64_t, tuple>((arg("z")=10, arg("width")=100, arg("adjustment")=tuple())))
-	;
-	scope().attr("cm") = 10'000'000;
-	scope().attr("mm") =  1'000'000;
-	scope().attr("um") =      1'000;
-	scope().attr("nm") =          1;
-
-}
-*/
 
 class TestClass
 {
@@ -200,6 +109,11 @@ PYBIND11_MODULE(xet, m)
 	py::class_<TestClass> testClass(m, "TestClass");
 	testClass
 		.def(py::init<int, int64_t, py::tuple>(), "z"_a = 10, "width"_a = 100, "adjustment"_a = py::tuple{});
+
+	py::class_<xet::Document>(m, "Document")
+		.def(py::init<>())
+		.def("addInput", &xet::Document::addInput);
+
 
 }
 

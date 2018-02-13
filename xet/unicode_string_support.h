@@ -33,6 +33,7 @@
 #include <boost/regex/pending/unicode_iterator.hpp>
 #include <boost/filesystem.hpp>
 
+namespace fs = boost::filesystem;
 
 namespace uts {
 
@@ -46,6 +47,9 @@ inline std::string toUtf8(std::string const& s)
 std::u32string toUtf32(std::string const& s);
 std::u32string toUtf32(std::wstring const& s);
 std::u32string toUtf32(char const* s, size_t size);
+std::wstring toWString(std::u32string const& s);
+fs::path toPath(std::u32string const& s);
+std::u32string toUtf32(fs::path const&);
 
 inline std::u32string toUtf32(std::u32string const& s)
 {

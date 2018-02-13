@@ -11,12 +11,15 @@
 
 #include "unicode_string_support.h"
 #include "xet_input.h"
-//#include "xet_parser.h"
-//#include "xet_input_error.h"
+#include "xet_parser.h"
+#include "xet_input_error.h"
+#include "xet_document.h"
 
 
 namespace py = pybind11;
 using namespace std::string_literals;
+
+namespace input {
 
 std::u32string loadUTF8TextFile(fs::path const& path)
 {
@@ -45,9 +48,6 @@ void test_xet_input(fs::path const& path)
 }
 */
 
-namespace input {
-
-/*
 class TokenVisitor : public boost::static_visitor<>
 {
 	Tokens& m_tokens;
@@ -67,7 +67,6 @@ public:
 
 	void operator()(parser::PyExpr const& a)
 	{
-/ *
 		auto name = std::u32string{ a.cs.name.begin(), a.cs.name.end() };
 		//auto src = name + a.cs.args ? std::u32string{ a.cs.args.begin(), a.cs.args.end() } : U"()"s;
 		auto csi = m_doc.controlSequences().find(name);
@@ -76,17 +75,18 @@ public:
 		py::object r;
 		if (a.cs.args)
 		{
-			auto args_dict = m_eval(U"___f___"s + std::u32string{ a.cs.args.begin(), a.cs.args.end() }, m_doc.environment(), m_argsConverter);
+			auto args_dict = m_eval(U"___f___"s + std::u32string{ a.cs.args->begin(), a.cs.args->end() }, m_doc.environment(), m_argsConverter);
 			r = csi->second.callable(**args_dict);
 		}
 		else
 			r = csi->second.callable();
-* /
 	}
 
 	void operator()(parser::PyCode const& a)
 	{
-		auto src = std::u32string{ a.text.begin().line()-1, U'\n' } + std::u32string{a.text.begin(), a.text.end()};
+		auto x = a.text.end();
+		auto src = //std::u32string{ a.text.begin().line()-1, U'\n' } + 
+			std::u32string{a.text.begin(), a.text.end()};
 		auto code = m_compile(src, m_fileName, "exec");
 		m_exec(code, m_doc.environment());
 	}
@@ -105,8 +105,7 @@ public:
 		);
 	}
 };
-*/
-/*
+
 Tokens convert(parser::Tokens const& in, fs::path const& fileName, xet::Document& doc)
 {
 	Tokens r;
@@ -115,6 +114,6 @@ Tokens convert(parser::Tokens const& in, fs::path const& fileName, xet::Document
 		boost::apply_visitor(visitor, token);
 	return r;
 }
-*/
+
 
 } // namespace input

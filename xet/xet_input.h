@@ -10,11 +10,17 @@
 #include <pybind11/pybind11.h>
 #include "interfaces.h"
 #include "xet_parser.h"
-#include "xet_document.h"
 
 namespace py = pybind11;
 
+namespace xet {
+class Document;
+}
+
+
 namespace input {
+
+std::u32string loadUTF8TextFile(fs::path const& path);
 
 // input stream
 
@@ -104,5 +110,5 @@ Tokens convert(parser::Tokens const&, fs::path const& fileName, xet::Document& d
 
 
 
-void test_xet_input(fs::path const& path);
+//void test_xet_input(fs::path const& path);
 
