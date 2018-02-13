@@ -1,6 +1,6 @@
 \py{
 import xet
-from xet import cs, mm, cm
+from xet import mm, cm
 
 #hallo
 
@@ -8,22 +8,30 @@ left = 0
 center = 1
 right = 2
 
-@cs
-class section(xet.ControlSeq):
-	pass
+#@cs
+#class section(xet.ControlSeq):
+#	pass
 
-@cs('frame')
-class CSFrame(xet.ControlSeq):
-	def __init__(self, pos=center, width=0, **kwds):
-		super().__init__(**kwds)
+#@cs('frame')
+#class CSFrame(xet.ControlSeq):
+#	def __init__(self, pos=center, width=0, **kwds):
+#		super().__init__(**kwds)
 
 @cs('logo')
 def CSLogo():
 	return 'xet'
 
+@cs
+def section():
+	return 'section'
 
+@cs
+def frame(**kwds):
+	return 'frame'
 
-
+@cs
+def ref():
+	return 'ref'
 
 }
 
@@ -35,7 +43,7 @@ foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar
 foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar
 foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar
 foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar
-\ref(fig.test1) hallo
+#\ref(fig.test1) hallo
 
 
 \frame(pos=center, width=5*xet.cm) {
