@@ -32,6 +32,7 @@
 #include <boost/optional.hpp>
 #include <boost/regex/pending/unicode_iterator.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace fs = boost::filesystem;
 
@@ -50,6 +51,12 @@ std::u32string toUtf32(char const* s, size_t size);
 std::wstring toWString(std::u32string const& s);
 fs::path toPath(std::u32string const& s);
 std::u32string toUtf32(fs::path const&);
+
+template<typename T>
+inline std::u32string toUtf32(T const& n)
+{
+	return toUtf32(boost::lexical_cast<std::string>(n));
+}
 
 inline std::u32string toUtf32(std::u32string const& s)
 {

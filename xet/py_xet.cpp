@@ -19,6 +19,7 @@
 #include "stdafx.h"
 #include <boost/filesystem.hpp>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl_bind.h>
 #include <fcntl.h>
 #include "py_xet.h"
 #include "unicode_string_support.h"
@@ -97,6 +98,34 @@ public:
 	};
 };
 
+class PyActor: public input::Actor
+{
+public:
+	/* Inherit the constructors */
+	using Actor::Actor;
+/*
+	void addedToPage(xet::PPage& page) override {
+		PYBIND11_OVERLOAD(
+			void,			// Return type
+			input::Actor,	// Parent class
+			addedToPage,	// Name of function in C++ (must match Python name)
+			page			// Argument(s)
+		);
+	}
+*/
+	void addedToPage() override {
+		PYBIND11_OVERLOAD(
+			void,			// Return type
+			input::Actor,	// Parent class
+			addedToPage		// Name of function in C++ (must match Python name)
+		);
+	}
+};
+
+PYBIND11_MAKE_OPAQUE(std::vector<input::Token>);
+//PYBIND11_MAKE_OPAQUE(input::Tokens);
+PYBIND11_MAKE_OPAQUE(std::vector<input::Tokens>);
+
 PYBIND11_MODULE(xet, m)
 {
 	using namespace py::literals;
@@ -110,10 +139,25 @@ PYBIND11_MODULE(xet, m)
 	testClass
 		.def(py::init<int, int64_t, py::tuple>(), "z"_a = 10, "width"_a = 100, "adjustment"_a = py::tuple{});
 
+	//py::bind_vector<input::Tokens>(m, "Tokens");
+	py::bind_vector<std::vector<input::Token>>(m, "Tokens");
+	py::bind_vector<std::vector<input::Tokens>>(m, "Groups");
+
+	py::class_<xet::CSDecoratorFromArgs>(m, "CSDecoratorFromArgs")
+		.def("__call__", &xet::CSDecoratorFromArgs::operator());
+	py::class_<xet::CSDecorator>(m, "CSDecorator")
+		.def("__call__", py::overload_cast<std::u32string const&>(&xet::CSDecorator::operator()))
+		.def("__call__", py::overload_cast<std::u32string const&, unsigned int>(&xet::CSDecorator::operator()))
+		.def("__call__", py::overload_cast<unsigned int>(&xet::CSDecorator::operator()))
+		.def("__call__", py::overload_cast<py::object>(&xet::CSDecorator::operator()));
+
 	py::class_<xet::Document>(m, "Document")
 		.def(py::init<>())
 		.def("addInput", &xet::Document::addInput);
 
+	py::class_<input::Actor, PyActor>(m, "Actor")
+		.def(py::init<>())
+		.def("addedToPage", &input::Actor::addedToPage);
 
 }
 

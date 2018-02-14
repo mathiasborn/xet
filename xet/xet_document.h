@@ -17,6 +17,7 @@ public:
 	struct ControlSequence
 	{
 		py::object callable;
+		unsigned int groups;
 	};
 	typedef std::unordered_map<std::u32string, ControlSequence> ControlSequences;
 
@@ -31,6 +32,30 @@ private:
 	py::dict m_environment;
 	std::forward_list<std::tuple<fs::path, std::u32string>> m_inputs;
 	input::Tokens m_tokens;
+};
+
+class CSDecoratorFromArgs
+{
+public:
+	CSDecoratorFromArgs(Document::ControlSequences& seqs, std::u32string const& name, unsigned int groups = 0):
+		m_controlSequences(seqs), m_name(name), m_groups(groups) {};
+	py::object operator()(py::object);
+private:
+	Document::ControlSequences& m_controlSequences;
+	std::u32string m_name;
+	unsigned int m_groups;
+};
+
+class CSDecorator
+{
+public:
+	CSDecorator(Document::ControlSequences& seqs): m_controlSequences(seqs) {};
+	py::object operator()(py::object);
+	CSDecoratorFromArgs operator()(std::u32string const&);
+	CSDecoratorFromArgs operator()(std::u32string const&, unsigned int groups);
+	CSDecoratorFromArgs operator()(unsigned int groups);
+private:
+	Document::ControlSequences& m_controlSequences;
 };
 
 }	// namespace xet

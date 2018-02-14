@@ -31,7 +31,7 @@ struct Text
 	TextRange text;
 };
 
-struct Block;
+struct Group;
 struct PyExpr;
 
 typedef boost::variant<
@@ -42,7 +42,7 @@ typedef boost::variant<
 > Token;
 typedef std::vector<Token> Tokens;
 
-struct Block
+struct Group
 {
 	Tokens tokens;
 };
@@ -50,7 +50,7 @@ struct Block
 struct PyExpr
 {
 	PyControlSequence cs;
-	std::vector<Tokens> blocks;
+	std::vector<Tokens> groups;
 };
 
 std::ostream& operator<<(std::ostream& s, TextRange const& text);
@@ -61,7 +61,7 @@ std::ostream& operator<<(std::ostream& s, NewParagraph const&);
 std::ostream& operator<<(std::ostream& s, Text const&);
 std::ostream& operator<<(std::ostream& s, Token const&);
 std::ostream& operator<<(std::ostream& s, Tokens const&);
-std::ostream& operator<<(std::ostream& s, Block const&);
+std::ostream& operator<<(std::ostream& s, Group const&);
 
 };	// namespace parser
 
@@ -74,7 +74,7 @@ template<> struct is_container<parser::PyCode const>: mpl::false_ {};
 BOOST_FUSION_ADAPT_STRUCT(
 	parser::PyExpr,
 	(parser::PyControlSequence, cs)
-	(std::vector<parser::Tokens>, blocks)
+	(std::vector<parser::Tokens>, groups)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -88,7 +88,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-	parser::Block,
+	parser::Group,
 	(parser::Tokens, tokens)
 )
 
@@ -109,7 +109,7 @@ struct XetParser: qi::grammar<Iterator, Tokens(), Skipper>
 	qi::rule<Iterator, Text(), Skipper> text;
 	//qi::rule<Iterator, Token(), Skipper> token;
 	qi::rule<Iterator, Tokens(), Skipper> tokens;
-	qi::rule<Iterator, Tokens(), Skipper> block;
+	qi::rule<Iterator, Tokens(), Skipper> group;
 	qi::rule<Iterator, Tokens(), Skipper> start;
 };
 

@@ -69,9 +69,9 @@ std::ostream& operator<<(std::ostream& s, parser::Tokens const& o)
 	return s;
 }
 
-std::ostream& operator<<(std::ostream& s, parser::Block const& o)
+std::ostream& operator<<(std::ostream& s, parser::Group const& o)
 {
-	s << "Block:" << o.tokens;
+	s << "Group:" << o.tokens;
 	return s;
 }
 
@@ -129,9 +129,9 @@ std::ostream& operator<<(std::ostream& s, Tokens const& o)
 	return s;
 }
 
-std::ostream& operator<<(std::ostream& s, Block const& o)
+std::ostream& operator<<(std::ostream& s, Group const& o)
 {
-	s << "Block:" << o.tokens;
+	s << "Group:" << o.tokens;
 	return s;
 }
 
@@ -146,10 +146,10 @@ XetParser<Iterator, Skipper>::XetParser() : XetParser::base_type(start, "start")
 	start = tokens.alias();
 	py_identifier = char_(L"A-Za-z_") >> *char_(L"0-9A-Za-z_");
 
-	//py_expr = lexeme[omit['\\'] >> raw[+py_identifier]] >> *block | lexeme[omit['\\'] >> no_skip[_py_expr]] >> *block;
-	py_expr = cs_parser >> *block | cs_parser >> *block;
+	//py_expr = lexeme[omit['\\'] >> raw[+py_identifier]] >> *group | lexeme[omit['\\'] >> no_skip[_py_expr]] >> *group;
+	py_expr = cs_parser >> *group | cs_parser >> *group;
 	
-	py_code_beg = lit("\\py") > '{';
+	py_code_beg = skip(blank)[lit("\\py") > '{' > eol];
 	//qi::on_error<qi::fail>(py_code_beg, std::cerr << ph::val("Expected '{' at offset ") << (qi::_3 - qi::_1) << " in \"" << std::string(qi::_1, qi::_2) << '"' << std::endl);
 	qi::on_error<qi::fail>(py_code_beg, [](auto const& args, auto& context, auto& r){
 		std::cerr << "Expected " << at_c<3>(args) << " at offset " << (at_c<2>(args) - at_c<0>(args)) << " in \"" << std::string(at_c<0>(args), at_c<1>(args)) << '"' << std::endl;
@@ -164,9 +164,9 @@ XetParser<Iterator, Skipper>::XetParser() : XetParser::base_type(start, "start")
 
 	text = raw[lexeme[+(char_ - char_("{}\\#") - eol - blank - new_paragraph_pattern)]] >> eps;
 
-	tokens = *(py_code | py_expr | new_paragraph | block | text);
+	tokens = *(py_code | py_expr | new_paragraph | group | text);
 
-	block = '{' >> *(py_expr | new_paragraph | text) >> '}';
+	group = '{' >> *(py_expr | new_paragraph | text) >> '}';
 
 	BOOST_SPIRIT_DEBUG_NODE(py_code_beg);
 	//BOOST_SPIRIT_DEBUG_NODE(py_code_end);
@@ -175,7 +175,7 @@ XetParser<Iterator, Skipper>::XetParser() : XetParser::base_type(start, "start")
 	BOOST_SPIRIT_DEBUG_NODE(new_paragraph);
 	BOOST_SPIRIT_DEBUG_NODE(text);
 	BOOST_SPIRIT_DEBUG_NODE(tokens);
-	BOOST_SPIRIT_DEBUG_NODE(block);
+	BOOST_SPIRIT_DEBUG_NODE(group);
 	BOOST_SPIRIT_DEBUG_NODE(start);
 
 }

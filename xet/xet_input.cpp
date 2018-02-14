@@ -51,18 +51,21 @@ void test_xet_input(fs::path const& path)
 class TokenVisitor : public boost::static_visitor<>
 {
 	Tokens& m_tokens;
+	fs::path const& m_path;
 	std::u32string m_fileName;
 	xet::Document& m_doc;
-	py::object m_compile, m_exec, m_eval;
+	py::object m_compile, m_exec, m_eval, m_signature;
 	py::dict m_argsConverter;
 public:
-	TokenVisitor(Tokens& tokens, fs::path const& fileName, xet::Document& doc): m_tokens(tokens), m_fileName{uts::toUtf32(fileName.wstring())}, m_doc{doc}
+	TokenVisitor(Tokens& tokens, fs::path const& fileName, xet::Document& doc): m_tokens(tokens), m_path(fileName), m_fileName{uts::toUtf32(fileName.wstring())}, m_doc{doc}
 	{
 		auto builtins = py::module::import("builtins");
 		m_compile = builtins.attr("compile");
 		m_exec = builtins.attr("exec");
 		m_eval = builtins.attr("eval");
 		m_argsConverter["___f___"] = m_eval("lambda **kwds: kwds");
+		auto inspect = py::module::import("inspect");
+		m_signature = inspect.attr("signature");
 	};
 
 	void operator()(parser::PyExpr const& a)
@@ -73,20 +76,32 @@ public:
 		if (csi == m_doc.controlSequences().end())
 			throw Error(m_fileName, a.cs.name.begin(), U"Unknown control sequence '"s + name + U"'.");
 		py::object r;
+		py::dict args_dict;
 		if (a.cs.args)
+			args_dict = m_eval(U"___f___"s + std::u32string{ a.cs.args->begin(), a.cs.args->end() }, m_doc.environment(), m_argsConverter);
+		Groups groups;
+		groups.reserve(a.groups.size());
+		for(auto const& group: a.groups) groups.push_back(convert(group, m_path, m_doc));
+		if (csi->second.groups == 1)
 		{
-			auto args_dict = m_eval(U"___f___"s + std::u32string{ a.cs.args->begin(), a.cs.args->end() }, m_doc.environment(), m_argsConverter);
-			r = csi->second.callable(**args_dict);
+			if (a.groups.size() != 1)
+				throw Error(m_fileName, a.cs.name.begin(), U"Control sequence '"s + name + U"' requires one group, but " + uts::toUtf32(a.groups.size()) + U" is/are given.");
+			args_dict["group"] = groups[0];
 		}
-		else
-			r = csi->second.callable();
+		else if (csi->second.groups > 1)
+		{
+			if (a.groups.size() != csi->second.groups)
+				throw Error(m_fileName, a.cs.name.begin(), U"Control sequence '"s + name + U"' requires " + uts::toUtf32(csi->second.groups) + U" groups, but " + uts::toUtf32(a.groups.size()) + U" is/are given.");
+			args_dict["groups"] = groups;
+		}
+		r = csi->second.callable(**args_dict);
+		
+		m_tokens.emplace_back(
 	}
 
 	void operator()(parser::PyCode const& a)
 	{
-		auto x = a.text.end();
-		auto src = //std::u32string{ a.text.begin().line()-1, U'\n' } + 
-			std::u32string{a.text.begin(), a.text.end()};
+		auto src = std::u32string(static_cast<std::u32string::size_type>(a.text.begin().line()-1), U'\n') + std::u32string{a.text.begin(), a.text.end()};
 		auto code = m_compile(src, m_fileName, "exec");
 		m_exec(code, m_doc.environment());
 	}

@@ -2,32 +2,27 @@
 import xet
 from xet import mm, cm
 
-#hallo
 
 left = 0
 center = 1
 right = 2
 
-#@cs
-#class section(xet.ControlSeq):
-#	pass
-
-#@cs('frame')
-#class CSFrame(xet.ControlSeq):
-#	def __init__(self, pos=center, width=0, **kwds):
-#		super().__init__(**kwds)
+@cs('frame', 1)
+class CSFrame(xet.Actor):
+	def __init__(self, pos=center, width=0, group=None):
+		super().__init__()
+		self.pos = pos
+		self.width = width
+		self.group = group
 
 @cs('logo')
 def CSLogo():
 	return 'xet'
 
-@cs
-def section():
+@cs(1)
+def section(group=None):
 	return 'section'
 
-@cs
-def frame(**kwds):
-	return 'frame'
 
 @cs
 def ref():

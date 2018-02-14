@@ -10,8 +10,6 @@ namespace parser {
 
 struct PyControlSequence
 {
-	PyControlSequence() {};
-	~PyControlSequence() {};
 	LinePosTextRange name;
 	boost::optional<LinePosTextRange> args;
 };

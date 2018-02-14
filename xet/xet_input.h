@@ -29,7 +29,7 @@ class Callable : public Token
 {
 public:
 	Callable() {};
-	Callable(Tokens&& block) : m_block{ std::move(block) } {};
+	Callable(Tokens&& group) : m_block{ std::move(group) } {};
 
 	virtual Tokens result() = 0;
 protected:
@@ -48,6 +48,10 @@ class Text
 public:
 	Text() {};
 	Text(std::u32string const& text) : m_text(text) {};
+	friend bool operator==(const Text& lhs, const Text& rhs)
+	{
+		return lhs.m_text == rhs.m_text;
+	}
 
 	virtual std::u32string const& text() const { return m_text; }
 private:
@@ -58,12 +62,21 @@ class ActiveToken
 {
 public:
 	ActiveToken(PActor actor): m_actor(actor) {};
+	friend bool operator==(const ActiveToken& lhs, const ActiveToken& rhs)
+	{
+		return lhs.m_actor == rhs.m_actor;
+	}
 protected:
 	PActor m_actor;
 };
 
 class Glue
 {
+public:
+	friend bool operator==(const Glue& lhs, const Glue& rhs)
+	{
+		return lhs.m_width == rhs.m_width && lhs.m_stretchability == rhs.m_stretchability && lhs.m_shrinkability == rhs.m_shrinkability;
+	}
 
 private:
 	xet::Size m_width;
@@ -76,23 +89,37 @@ class Penalty
 public:
 	static constexpr int pinf = +1000;
 	static constexpr int ninf = -1000;
+
+	friend bool operator==(const Penalty& lhs, const Penalty& rhs)
+	{
+		return lhs.m_value == rhs.m_value && lhs.m_width == rhs.m_width;
+	}
 private:
 	int m_value;
 	xet::Size m_width;
 };
 
-class ParagraphSeperator {};
+class ParagraphSeperator
+{
+public:
+	friend bool operator==(const ParagraphSeperator&, const ParagraphSeperator&)
+	{
+		return true;
+	}
+};
 
 typedef std::variant<ParagraphSeperator, Penalty, Glue, Text, ActiveToken> Token;
 typedef std::vector<Token> Tokens;
+typedef std::vector<Tokens> Groups;
 
 
 class Actor : public boost::intrusive_ref_counter<Actor, boost::thread_unsafe_counter>
 {
 public:
 	virtual ~Actor() {};
-	virtual void addedToPage(xet::PPage&) {};
-	virtual Tokens addedToTypeSetter() { return {}; }
+	virtual void addedToPage() {};
+	//virtual void addedToPage(xet::PPage&) {};
+	//virtual Tokens addedToTypeSetter() { return {}; }
 };
 
 /*
