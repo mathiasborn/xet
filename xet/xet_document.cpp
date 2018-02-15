@@ -37,7 +37,7 @@ void Document::addInput(fs::path const& fileName)
 	auto const& text = std::get<1>(t);
 	auto parseTokens = parser::parse(text.begin(), text.end());
 	auto tokens = input::convert(parseTokens, fileName, *this);
-	m_tokens.insert(m_tokens.end(), tokens.begin(), tokens.end());
+	m_tokens->insert(m_tokens->end(), tokens.begin(), tokens.end());
 }
 
 

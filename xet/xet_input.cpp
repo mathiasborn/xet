@@ -94,9 +94,13 @@ public:
 				throw Error(m_fileName, a.cs.name.begin(), U"Control sequence '"s + name + U"' requires " + uts::toUtf32(csi->second.groups) + U" groups, but " + uts::toUtf32(a.groups.size()) + U" is/are given.");
 			args_dict["groups"] = groups;
 		}
+		
 		r = csi->second.callable(**args_dict);
 		
-		m_tokens.emplace_back(
+		if (py::isinstance<py::str>(r))
+		{
+			m_tokens.emplace_back(input::Text(py::cast<std::u32string>(r)));
+		}
 	}
 
 	void operator()(parser::PyCode const& a)
@@ -121,10 +125,10 @@ public:
 	}
 };
 
-Tokens convert(parser::Tokens const& in, fs::path const& fileName, xet::Document& doc)
+PTokens convert(parser::Tokens const& in, fs::path const& fileName, xet::Document& doc)
 {
-	Tokens r;
-	auto visitor = TokenVisitor{r, fileName, doc};
+	auto r = std::make_shared<Tokens>();
+	auto visitor = TokenVisitor{*r, fileName, doc};
 	for (auto& token: in)
 		boost::apply_visitor(visitor, token);
 	return r;

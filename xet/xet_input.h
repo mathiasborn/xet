@@ -110,8 +110,9 @@ public:
 
 typedef std::variant<ParagraphSeperator, Penalty, Glue, Text, ActiveToken> Token;
 typedef std::vector<Token> Tokens;
-typedef std::vector<Tokens> Groups;
-
+typedef std::shared_ptr<Tokens> PTokens;
+typedef std::vector<PTokens> Groups;
+//typedef std::shared_ptr<Groups> PGroups;
 
 class Actor : public boost::intrusive_ref_counter<Actor, boost::thread_unsafe_counter>
 {
@@ -131,7 +132,7 @@ std::vector<std::u32string> m_parts;
 };
 */
 
-Tokens convert(parser::Tokens const&, fs::path const& fileName, xet::Document& doc);
+PTokens convert(parser::Tokens const&, fs::path const& fileName, xet::Document& doc);
 
 } // namespace input
 

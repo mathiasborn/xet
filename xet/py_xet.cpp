@@ -25,6 +25,7 @@
 #include "unicode_string_support.h"
 #include "platform.h"
 #include "xet_document.h"
+#include "xet_input.h"
 
 namespace py = pybind11;
 
@@ -122,9 +123,9 @@ public:
 	}
 };
 
-PYBIND11_MAKE_OPAQUE(std::vector<input::Token>);
-//PYBIND11_MAKE_OPAQUE(input::Tokens);
-PYBIND11_MAKE_OPAQUE(std::vector<input::Tokens>);
+PYBIND11_MAKE_OPAQUE(input::Tokens);
+PYBIND11_MAKE_OPAQUE(input::Groups);
+PYBIND11_DECLARE_HOLDER_TYPE(T, boost::intrusive_ptr<T>, true);
 
 PYBIND11_MODULE(xet, m)
 {
@@ -139,9 +140,8 @@ PYBIND11_MODULE(xet, m)
 	testClass
 		.def(py::init<int, int64_t, py::tuple>(), "z"_a = 10, "width"_a = 100, "adjustment"_a = py::tuple{});
 
-	//py::bind_vector<input::Tokens>(m, "Tokens");
-	py::bind_vector<std::vector<input::Token>>(m, "Tokens");
-	py::bind_vector<std::vector<input::Tokens>>(m, "Groups");
+	py::bind_vector<input::Tokens, input::PTokens>(m, "Tokens");
+	py::bind_vector<input::Groups>(m, "Groups");
 
 	py::class_<xet::CSDecoratorFromArgs>(m, "CSDecoratorFromArgs")
 		.def("__call__", &xet::CSDecoratorFromArgs::operator());
@@ -155,7 +155,7 @@ PYBIND11_MODULE(xet, m)
 		.def(py::init<>())
 		.def("addInput", &xet::Document::addInput);
 
-	py::class_<input::Actor, PyActor>(m, "Actor")
+	py::class_<input::Actor, PyActor, input::PActor>(m, "Actor")
 		.def(py::init<>())
 		.def("addedToPage", &input::Actor::addedToPage);
 

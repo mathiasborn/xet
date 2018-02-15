@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <forward_list>
 #include <tuple>
+#include <memory>
 #include <pybind11/pybind11.h>
 #include "xet_input.h"
 
@@ -31,7 +32,7 @@ private:
 	ControlSequences m_controlSequences;
 	py::dict m_environment;
 	std::forward_list<std::tuple<fs::path, std::u32string>> m_inputs;
-	input::Tokens m_tokens;
+	input::PTokens m_tokens = std::make_shared<input::Tokens>();
 };
 
 class CSDecoratorFromArgs
