@@ -52,6 +52,7 @@ public:
 	{
 		return lhs.m_text == rhs.m_text;
 	}
+	//operator std::u32string() { return m_text; }
 
 	virtual std::u32string const& text() const { return m_text; }
 private:
@@ -73,15 +74,18 @@ protected:
 class Glue
 {
 public:
+	Glue() {};
+	Glue(xet::Size width, xet::Size stretchability, xet::Size shrinkability):
+		m_width(width), m_stretchability(stretchability), m_shrinkability(shrinkability) {};
 	friend bool operator==(const Glue& lhs, const Glue& rhs)
 	{
 		return lhs.m_width == rhs.m_width && lhs.m_stretchability == rhs.m_stretchability && lhs.m_shrinkability == rhs.m_shrinkability;
 	}
 
 private:
-	xet::Size m_width;
-	xet::Size m_stretchability;
-	xet::Size m_shrinkability;
+	xet::Size m_width = 0;
+	xet::Size m_stretchability = 0;
+	xet::Size m_shrinkability = 0;
 };
 
 class Penalty

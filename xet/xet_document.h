@@ -28,6 +28,7 @@ public:
 
 	ControlSequences& controlSequences() { return m_controlSequences; }
 	py::dict& environment() { return m_environment; }
+	input::PTokens tokens() const { return m_tokens; }
 private:
 	ControlSequences m_controlSequences;
 	py::dict m_environment;

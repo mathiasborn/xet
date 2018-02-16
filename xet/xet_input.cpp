@@ -101,6 +101,18 @@ public:
 		{
 			m_tokens.emplace_back(input::Text(py::cast<std::u32string>(r)));
 		}
+		else if (py::isinstance<input::Tokens>(r))
+		{
+			auto t = py::cast<input::PTokens>(r);
+			m_tokens.insert(m_tokens.end(), t->begin(), t->end());
+		}
+		else if (py::isinstance<input::Actor>(r))
+		{
+			auto t = py::cast<input::Actor*>(r);
+			m_tokens.emplace_back(input::ActiveToken(t));
+		}
+		else
+			throw Error(m_fileName, a.cs.name.begin(), U"Control sequence '"s + name + U"': Invalid return type.");
 	}
 
 	void operator()(parser::PyCode const& a)

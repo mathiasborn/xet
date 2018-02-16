@@ -20,6 +20,7 @@
 #include <boost/filesystem.hpp>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl_bind.h>
+#include <pybind11/stl.h>
 #include <fcntl.h>
 #include "py_xet.h"
 #include "unicode_string_support.h"
@@ -28,6 +29,7 @@
 #include "xet_input.h"
 
 namespace py = pybind11;
+using namespace std::string_literals;
 
 
 PyException::PyException(py::error_already_set& e)
@@ -118,7 +120,7 @@ public:
 		PYBIND11_OVERLOAD(
 			void,			// Return type
 			input::Actor,	// Parent class
-			addedToPage		// Name of function in C++ (must match Python name)
+			addedToPage,	// Name of function in C++ (must match Python name)
 		);
 	}
 };
@@ -153,11 +155,22 @@ PYBIND11_MODULE(xet, m)
 
 	py::class_<xet::Document>(m, "Document")
 		.def(py::init<>())
-		.def("addInput", &xet::Document::addInput);
+		.def("addInput", &xet::Document::addInput)
+		.def_property_readonly("tokens", &xet::Document::tokens);
 
 	py::class_<input::Actor, PyActor, input::PActor>(m, "Actor")
 		.def(py::init<>())
 		.def("addedToPage", &input::Actor::addedToPage);
+
+	py::class_<input::Text>(m, "Text")
+		.def(py::init<std::u32string const&>(), "text"_a)
+		.def("__repr__", [](input::Text const& a){ return U"xet.Text('"s + a.text() + U"')"; })
+		.def_property_readonly("text", &input::Text::text);
+
+	py::class_<input::Glue>(m, "Glue")
+		.def(py::init<xet::Size, xet::Size, xet::Size>(), "width"_a, "stretchability"_a, "shrinkability"_a);
+
+
 
 }
 

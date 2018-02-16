@@ -21,7 +21,9 @@ def CSLogo():
 
 @cs(1)
 def section(group=None):
-	return 'section'
+	t = xet.Tokens()
+	t.append(xet.Glue(0, 0, 0))
+	return t
 
 
 @cs
@@ -39,6 +41,8 @@ foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar
 foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar
 foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar
 #\ref(fig.test1) hallo
+\ref
+
 
 
 \frame(pos=center, width=5*xet.cm) {
