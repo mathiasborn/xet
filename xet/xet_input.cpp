@@ -48,6 +48,27 @@ void test_xet_input(fs::path const& path)
 }
 */
 
+ActiveToken::operator std::u32string() const
+{
+	return U"<xet.ActiveToken at "s + uts::toUtf32(this) + U'>';
+}
+
+Glue::operator std::u32string() const
+{
+	return U"xet.Glue("s + uts::toUtf32(m_width) + U", " + uts::toUtf32(m_stretchability) + U", " + uts::toUtf32(m_shrinkability) + U')';
+}
+
+Penalty::operator std::u32string() const
+{
+	return U"xet.Penalty("s + uts::toUtf32(m_value) + U", " + uts::toUtf32(m_width) + U')';
+}
+
+ParagraphSeperator::operator std::u32string() const
+{
+	return U"<xet.ParagraphSeperator"s;
+}
+
+
 class TokenVisitor : public boost::static_visitor<>
 {
 	Tokens& m_tokens;
@@ -100,6 +121,11 @@ public:
 		if (py::isinstance<py::str>(r))
 		{
 			m_tokens.emplace_back(input::Text(py::cast<std::u32string>(r)));
+		}
+		else if (py::isinstance<input::Text>(r) || py::isinstance<input::Glue>(r) || py::isinstance<input::Penalty>(r) || py::isinstance<input::ParagraphSeperator>(r))
+		{
+			auto t = py::cast<input::Token>(r);
+			m_tokens.push_back(t);
 		}
 		else if (py::isinstance<input::Tokens>(r))
 		{

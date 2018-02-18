@@ -27,8 +27,8 @@ def section(group=None):
 
 
 @cs
-def ref():
-	return 'ref'
+def par():
+	return xet.ParagraphSeperator()
 
 }
 
@@ -41,7 +41,7 @@ foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar
 foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar
 foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar
 #\ref(fig.test1) hallo
-\ref
+\par
 
 
 

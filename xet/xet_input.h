@@ -52,7 +52,6 @@ public:
 	{
 		return lhs.m_text == rhs.m_text;
 	}
-	//operator std::u32string() { return m_text; }
 
 	virtual std::u32string const& text() const { return m_text; }
 private:
@@ -67,6 +66,7 @@ public:
 	{
 		return lhs.m_actor == rhs.m_actor;
 	}
+	operator std::u32string() const;
 protected:
 	PActor m_actor;
 };
@@ -81,6 +81,7 @@ public:
 	{
 		return lhs.m_width == rhs.m_width && lhs.m_stretchability == rhs.m_stretchability && lhs.m_shrinkability == rhs.m_shrinkability;
 	}
+	operator std::u32string() const;
 
 private:
 	xet::Size m_width = 0;
@@ -94,10 +95,13 @@ public:
 	static constexpr int pinf = +1000;
 	static constexpr int ninf = -1000;
 
+	Penalty(int value, xet::Size width): m_value(value), m_width(width) {};
+
 	friend bool operator==(const Penalty& lhs, const Penalty& rhs)
 	{
 		return lhs.m_value == rhs.m_value && lhs.m_width == rhs.m_width;
 	}
+	operator std::u32string() const;
 private:
 	int m_value;
 	xet::Size m_width;
@@ -110,6 +114,7 @@ public:
 	{
 		return true;
 	}
+	operator std::u32string() const;
 };
 
 typedef std::variant<ParagraphSeperator, Penalty, Glue, Text, ActiveToken> Token;

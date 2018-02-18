@@ -168,9 +168,21 @@ PYBIND11_MODULE(xet, m)
 		.def_property_readonly("text", &input::Text::text);
 
 	py::class_<input::Glue>(m, "Glue")
-		.def(py::init<xet::Size, xet::Size, xet::Size>(), "width"_a, "stretchability"_a, "shrinkability"_a);
+		.def(py::init<xet::Size, xet::Size, xet::Size>(), "width"_a, "stretchability"_a, "shrinkability"_a)
+		.def("__repr__", [](input::Glue const& a){ return static_cast<std::u32string>(a); });
 
+	py::class_<input::Penalty>(m, "Penalty")
+		.def(py::init<int, xet::Size>(), "value"_a, "width"_a)
+		.def_property_readonly_static("pinf", [](py::object){ return input::Penalty::pinf; })
+		.def_property_readonly_static("ninf", [](py::object){ return input::Penalty::ninf; })
+		.def("__repr__", [](input::Penalty const& a){ return static_cast<std::u32string>(a); });
 
+	py::class_<input::ParagraphSeperator>(m, "ParagraphSeperator")
+		.def(py::init<>())
+		.def("__repr__", [](input::ParagraphSeperator const& a){ return static_cast<std::u32string>(a); });
+
+	py::class_<input::ActiveToken>(m, "ActiveToken")
+		.def("__repr__", [](input::ActiveToken const& a){ return static_cast<std::u32string>(a); });
 
 }
 
