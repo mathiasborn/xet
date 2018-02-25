@@ -32,6 +32,20 @@ class MainText(xet.TypeSetter):
 			et.Rectangle(top=self.y, left=self.x+self.colWidth+sel.colSep, width=self.colWidth, height=self.height*h1)]
 			
 			
+@firstpage
+class NormalPage(xet.Page):
+	def __init__(self, **kwds):
+		super().__init__(width=210*mm, height=297*mm, **kwds)
+		self.mainText = MainText()
+		super().setTypeSetter(self.mainText)
+
+	def nextPage(self):
+		return NormalPage()
+	
+	# copy of this instance
+	def copy(self):
+		
+
 
 
 @cs('frame', 1)
