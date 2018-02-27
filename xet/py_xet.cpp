@@ -95,11 +95,23 @@ std::string pythonExceptionToText(py::error_already_set& e)
 class TestClass
 {
 public:
+	TestClass(TestClass const&)
+	{
+		std::cout << "TestClass(TestClass const&)" << std::endl;
+	}
 	TestClass(int z, int64_t width, py::tuple adjustment)
 	{
 		std::cout << "z=" << z << " width=" << width << " len(adjustment)=" << py::len(adjustment) << std::endl;
 	};
 };
+typedef std::shared_ptr<TestClass> PTestClass;
+
+/*
+class PyTestClass: public TestClass
+{
+public:
+	using TestClass::TestClass;
+*/
 
 class PyActor: public input::Actor
 {
@@ -138,8 +150,9 @@ PYBIND11_MODULE(xet, m)
 	m.attr("um") = 1'000;
 	m.attr("nm") = 1;
 
-	py::class_<TestClass> testClass(m, "TestClass");
+	py::class_<TestClass, PTestClass> testClass(m, "TestClass");
 	testClass
+		.def(py::init<TestClass const&>(), "other"_a)
 		.def(py::init<int, int64_t, py::tuple>(), "z"_a = 10, "width"_a = 100, "adjustment"_a = py::tuple{});
 
 	py::bind_vector<input::Tokens, input::PTokens>(m, "Tokens");
@@ -168,6 +181,7 @@ PYBIND11_MODULE(xet, m)
 		.def_property_readonly("text", &input::Text::text);
 
 	py::class_<input::Glue>(m, "Glue")
+		.def(py::init<>())
 		.def(py::init<xet::Size, xet::Size, xet::Size>(), "width"_a, "stretchability"_a, "shrinkability"_a)
 		.def("__repr__", [](input::Glue const& a){ return static_cast<std::u32string>(a); });
 

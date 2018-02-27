@@ -38,6 +38,14 @@ void Document::addInput(fs::path const& fileName)
 	auto parseTokens = parser::parse(text.begin(), text.end());
 	auto tokens = input::convert(parseTokens, fileName, *this);
 	m_tokens->insert(m_tokens->end(), tokens->begin(), tokens->end());
+
+	std::cout << "=== t1 ===" << std::endl;
+	auto t1 = m_environment["t1"];
+	std::cout << py::cast<std::string>(py::str(t1)) << std::endl;
+	auto t1_class = t1.get_type();
+	std::cout << py::cast<std::string>(py::str(t1_class)) << std::endl;
+	auto t2 = t1_class(t1);
+	std::cout << py::cast<std::string>(py::str(t2)) << std::endl;
 }
 
 
