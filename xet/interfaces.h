@@ -40,6 +40,7 @@ namespace xet {
 
 typedef gtl::polygon_data<Size> Polygon;
 typedef gtl::polygon_set_data<Size> PolygonSet;
+typedef std::vector<PolygonSet> PolygonSets;
 typedef gtl::polygon_traits<Polygon>::point_type Point;
 
 #define GETR(name) decltype(BOOST_PP_CAT(m_, name)) const& name() const { return BOOST_PP_CAT(m_, name); }
@@ -67,6 +68,7 @@ public:
 	GETV(cutOrder)
 };
 
+/*
 class TextArea: public VisibleCanvasElement
 {
 	TextArea(std::tuple<Size, Size> adjustment, int32_t layer, int32_t cutOrder, bool simple);
@@ -81,25 +83,31 @@ public:
 
 typedef std::shared_ptr<TextArea> PTextArea;
 typedef std::vector<PTextArea> TextAreas;
+*/
 
-class TypeSetter: public CanvasElement
+class TypeSetter: public VisibleCanvasElement
 {
-	TypeSetter(TextAreas const& areas, bool balanced, std::u32string name);
-private:
-	TextAreas m_areas;
-	bool m_balanced;
-	std::u32string m_name;
 public:
-	GETR(areas)
-	GETV(balanced)
+	typedef VisibleCanvasElement Super;
+	
+	TypeSetter(int32_t layer, int32_t cutOrder, std::u32string name, bool simple):
+		Super(layer, cutOrder), m_name(name), m_simple(simple) {};
+	virtual PolygonSets geometry(double a) = 0;
+private:
+	std::u32string m_name;
+	bool m_simple = false;
+public:
 	GETR(name)
+	GETV(simple)
 };
 
 class Canvas: public VisibleCanvasElement
 {
 public:
-	Canvas(int32_t layer, int32_t cutOrder);
-	virtual PolygonSet geometry() const;
+	typedef VisibleCanvasElement Super;
+
+	Canvas(int32_t layer, int32_t cutOrder): Super(layer, cutOrder) {};
+	virtual PolygonSet geometry() = 0;
 private:
 	CanvasElements m_contents;
 public:
@@ -112,8 +120,11 @@ typedef std::shared_ptr<Page> PPage;
 class Page: public Canvas
 {
 public:
-	Page(Size width, Size height);
-	virtual PPage nextPage();
+	typedef Canvas Super;
+
+	Page(Size width, Size height): m_width(width), m_height(height) {};
+	virtual PolygonSet geometry() { return {}; }
+	virtual PPage nextPage() = 0;
 private:
 	Size m_width;
 	Size m_height;
@@ -122,11 +133,13 @@ public:
 	GETV(height)
 };
 
+/*
 class ControlSequence
 {
 };
 
 typedef std::shared_ptr<ControlSequence> PControlSequence;
+*/
 
 } // namespace xet
 

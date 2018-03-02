@@ -175,6 +175,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="unicode_string_support.h" />
     <ClInclude Include="xet_document.h" />
+    <ClInclude Include="xet_geometry.h" />
     <ClInclude Include="xet_input.h" />
     <ClInclude Include="xet_input_error.h" />
     <ClInclude Include="xet_line_pos_iterator.h" />
@@ -197,6 +198,7 @@
     <ClCompile Include="unicode_string_support.cpp" />
     <ClCompile Include="xet.cpp" />
     <ClCompile Include="xet_document.cpp" />
+    <ClCompile Include="xet_geometry.cpp" />
     <ClCompile Include="xet_input.cpp" />
     <ClCompile Include="xet_input_error.cpp" />
     <ClCompile Include="xet_parser.cpp" />
