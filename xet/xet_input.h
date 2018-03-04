@@ -123,7 +123,7 @@ typedef std::shared_ptr<Tokens> PTokens;
 typedef std::vector<PTokens> Groups;
 //typedef std::shared_ptr<Groups> PGroups;
 
-class Actor : public boost::intrusive_ref_counter<Actor, boost::thread_unsafe_counter>
+class Actor: public boost::intrusive_ref_counter<Actor, boost::thread_unsafe_counter>
 {
 public:
 	virtual ~Actor() {};

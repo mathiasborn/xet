@@ -4,44 +4,9 @@
 #include <string>
 #include <tuple>
 #include <memory>
-#include <boost/polygon/polygon.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/preprocessor/cat.hpp>
-
-namespace gtl = boost::polygon;
-namespace mp = boost::multiprecision;
+#include "xet_geometry.h"
 
 namespace xet {
-	typedef int64_t Size;
-};
-
-namespace boost {
-	namespace polygon {
-/*
-		template <>
-		struct coordinate_traits<xet::Size> {
-			typedef int64_t coordinate_type;
-			typedef long double area_type;
-			typedef mp::int128_t manhattan_area_type;
-			typedef mp::uint128_t unsigned_area_type;
-			typedef mp::int128_t coordinate_difference;
-			typedef mp::cpp_rational coordinate_distance;
-		};
-*/
-		template <>
-		struct high_precision_type<int64_t> {
-			typedef mp::cpp_rational type;
-		};
-
-	};
-};
-
-namespace xet {
-
-typedef gtl::polygon_data<Size> Polygon;
-typedef gtl::polygon_set_data<Size> PolygonSet;
-typedef std::vector<PolygonSet> PolygonSets;
-typedef gtl::polygon_traits<Polygon>::point_type Point;
 
 #define GETR(name) decltype(BOOST_PP_CAT(m_, name)) const& name() const { return BOOST_PP_CAT(m_, name); }
 #define GETV(name) decltype(BOOST_PP_CAT(m_, name)) name() const { return BOOST_PP_CAT(m_, name); }
@@ -106,7 +71,7 @@ class Canvas: public VisibleCanvasElement
 public:
 	typedef VisibleCanvasElement Super;
 
-	Canvas(int32_t layer, int32_t cutOrder): Super(layer, cutOrder) {};
+	Canvas(int32_t layer = 0, int32_t cutOrder = 0): Super(layer, cutOrder) {};
 	virtual PolygonSet geometry() = 0;
 private:
 	CanvasElements m_contents;

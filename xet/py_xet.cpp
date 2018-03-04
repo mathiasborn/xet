@@ -27,6 +27,7 @@
 #include "platform.h"
 #include "xet_document.h"
 #include "xet_input.h"
+#include "xet_geometry.h"
 
 namespace py = pybind11;
 using namespace std::string_literals;
@@ -198,6 +199,7 @@ PYBIND11_MODULE(xet, m)
 	py::class_<input::ActiveToken>(m, "ActiveToken")
 		.def("__repr__", [](input::ActiveToken const& a){ return static_cast<std::u32string>(a); });
 
+	xet::pyInitGeometry(m);
 }
 
 
