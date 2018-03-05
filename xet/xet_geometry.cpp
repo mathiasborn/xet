@@ -12,6 +12,18 @@ CPolygonSet::CPolygonSet(Polygon const& p)
 	m_set = p;
 }
 
+CPolygonSet::CPolygonSet(std::vector<Point> const& v)
+{
+	Polygon p;
+	gtl::set_points(p, v.cbegin(), v.cend());
+	m_set = p;
+}
+
+CPolygonSet::CPolygonSet(Rectangle const& p)
+{
+	m_set = p;
+}
+
 template <typename T> 
 CPolygonSet::CPolygonSet(T& v)
 {
@@ -90,6 +102,10 @@ void pyInitGeometry(py::module& m)
 		.def(py::init<>())
 		.def(py::init<py::list>())
 		.def(py::init<py::tuple>())
+		.def(py::init([](Size top, Size left, Size width, Size height)
+		{
+			return PCPolygonSet(new CPolygonSet(Rectangle(left, top, left+width, top));
+		}))
 		.def(py::self |= py::self)
 		.def(py::self | py::self)
 		.def(py::self &= py::self)

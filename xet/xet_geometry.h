@@ -39,6 +39,7 @@ struct high_precision_type<int64_t> {
 namespace xet {
 
 typedef gtl::polygon_data<Size> Polygon;
+typedef gtl::rectangle_data<Size> Rectangle;
 typedef gtl::polygon_set_data<Size> PolygonSet;
 typedef std::vector<PolygonSet> PolygonSets;
 typedef gtl::polygon_traits<Polygon>::point_type Point;
@@ -54,6 +55,8 @@ public:
 	CPolygonSet(CPolygonSet const&) = default;
 	CPolygonSet(PolygonSet const& set): m_set(set) {};
 	CPolygonSet(Polygon const&);
+	CPolygonSet(std::vector<Point> const&);
+	CPolygonSet(Rectangle const&);
 	template <typename T> CPolygonSet(T&);
 	
 	CPolygonSet& operator|=(const CPolygonSet& rhs);
