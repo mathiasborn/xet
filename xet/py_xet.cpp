@@ -32,6 +32,9 @@
 namespace py = pybind11;
 using namespace std::string_literals;
 
+PYBIND11_MAKE_OPAQUE(input::Tokens);
+PYBIND11_MAKE_OPAQUE(input::Groups);
+PYBIND11_DECLARE_HOLDER_TYPE(T, boost::intrusive_ptr<T>, true);
 
 PyException::PyException(py::error_already_set& e)
 {
@@ -138,9 +141,36 @@ public:
 	}
 };
 
-PYBIND11_MAKE_OPAQUE(input::Tokens);
-PYBIND11_MAKE_OPAQUE(input::Groups);
-PYBIND11_DECLARE_HOLDER_TYPE(T, boost::intrusive_ptr<T>, true);
+class PyTypeSetter: public xet::TypeSetter
+{
+public:
+	using TypeSetter::TypeSetter;	// Inherit the constructors
+
+	xet::PCPolygonSet geometry(double a) override
+	{
+		PYBIND11_OVERLOAD_PURE(
+			xet::PCPolygonSet,	// Return type
+			xet::TypeSetter,	// Parent class
+			geometry,			// Name of function in C++ (must match Python name)
+			a					// Argument(s)
+		);
+	}
+};
+
+class PyPage: public xet::Page
+{
+public:
+	using Page::Page;			// Inherit the constructors
+
+	xet::PPage nextPage() override
+	{
+		PYBIND11_OVERLOAD_PURE(
+			xet::PPage,			// Return type
+			xet::Page,			// Parent class
+			nextPage,			// Name of function in C++ (must match Python name)
+		);
+	}
+};
 
 PYBIND11_MODULE(xet, m)
 {
@@ -198,6 +228,14 @@ PYBIND11_MODULE(xet, m)
 
 	py::class_<input::ActiveToken>(m, "ActiveToken")
 		.def("__repr__", [](input::ActiveToken const& a){ return static_cast<std::u32string>(a); });
+
+	py::class_<xet::TypeSetter, PyTypeSetter, xet::PTypeSetter>(m, "TypeSetter")
+		.def(py::init<int32_t, int32_t, std::u32string, bool>(), "layer"_a, "cutOrder"_a, "name"_a, "simple"_a)
+		.def("geometry", &xet::TypeSetter::geometry);
+
+	py::class_<xet::Page, PyPage, xet::PPage>(m, "Page")
+		.def(py::init<xet::Size, xet::Size>(), "width"_a, "height"_a)
+		.def("nextPage", &xet::Page::nextPage);
 
 	xet::pyInitGeometry(m);
 }

@@ -98,14 +98,11 @@ PCPolygonSet operator-(CPolygonSet const& lhs, const CPolygonSet& rhs)
 
 void pyInitGeometry(py::module& m)
 {
+	using namespace py::literals;
 	py::class_<CPolygonSet, PCPolygonSet>(m, "PolygonSet")
 		.def(py::init<>())
 		.def(py::init<py::list>())
 		.def(py::init<py::tuple>())
-		.def(py::init([](Size top, Size left, Size width, Size height)
-		{
-			return PCPolygonSet(new CPolygonSet(Rectangle(left, top, left+width, top));
-		}))
 		.def(py::self |= py::self)
 		.def(py::self | py::self)
 		.def(py::self &= py::self)
@@ -115,6 +112,11 @@ void pyInitGeometry(py::module& m)
 		.def(py::self -= py::self)
 		.def(py::self - py::self);
 	py::implicitly_convertible<py::sequence, CPolygonSet>();
+	m.def("Rectangle", [](Size left, Size bottom, Size right, Size top)
+	{
+		return PCPolygonSet(new CPolygonSet(Rectangle(left, bottom, right, top)));
+	}, "left"_a, "top"_a, "right"_a, "top"_a);
+
 }
 
 }	// namespace xet

@@ -24,7 +24,7 @@ typedef std::vector<PCanvasElement> CanvasElements;
 class VisibleCanvasElement
 {
 public:
-	VisibleCanvasElement(int32_t layer, int32_t cutOrder);
+	VisibleCanvasElement(int32_t layer, int32_t cutOrder): m_layer(layer), m_cutOrder(cutOrder) {}
 private:
 	int32_t m_layer = 0;	// z-coordinate (depth), elements with higher values appear on top of elements with lower values
 	int32_t m_cutOrder = 0;	// elements with higher m_cutOrder cut into elements with lower order (on the same layer)
@@ -57,7 +57,7 @@ public:
 	
 	TypeSetter(int32_t layer, int32_t cutOrder, std::u32string name, bool simple):
 		Super(layer, cutOrder), m_name(name), m_simple(simple) {};
-	virtual PolygonSets geometry(double a) = 0;
+	virtual PCPolygonSet geometry(double a) = 0;
 private:
 	std::u32string m_name;
 	bool m_simple = false;
@@ -65,6 +65,7 @@ public:
 	GETR(name)
 	GETV(simple)
 };
+typedef std::shared_ptr<TypeSetter> PTypeSetter;
 
 class Canvas: public VisibleCanvasElement
 {
@@ -72,7 +73,7 @@ public:
 	typedef VisibleCanvasElement Super;
 
 	Canvas(int32_t layer = 0, int32_t cutOrder = 0): Super(layer, cutOrder) {};
-	virtual PolygonSet geometry() = 0;
+	virtual PCPolygonSet geometry() = 0;
 private:
 	CanvasElements m_contents;
 public:
@@ -88,7 +89,7 @@ public:
 	typedef Canvas Super;
 
 	Page(Size width, Size height): m_width(width), m_height(height) {};
-	virtual PolygonSet geometry() { return {}; }
+	virtual PCPolygonSet geometry() { return {}; }
 	virtual PPage nextPage() = 0;
 private:
 	Size m_width;
