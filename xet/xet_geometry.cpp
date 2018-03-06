@@ -115,7 +115,11 @@ void pyInitGeometry(py::module& m)
 	m.def("Rectangle", [](Size left, Size bottom, Size right, Size top)
 	{
 		return PCPolygonSet(new CPolygonSet(Rectangle(left, bottom, right, top)));
-	}, "left"_a, "top"_a, "right"_a, "top"_a);
+	}, "left"_a, "bottom"_a, "right"_a, "top"_a);
+	m.def("Rectangle", [](Size left, Size top, Size width, Size height)
+	{
+		return PCPolygonSet(new CPolygonSet(Rectangle(left, top-height, left+width, top)));
+	}, "left"_a, "top"_a, "width"_a, "height"_a);
 
 }
 

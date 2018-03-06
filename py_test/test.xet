@@ -9,41 +9,40 @@ right = 2
 
 t1 = xet.TestClass()
 
-if True:
-	class MainText(xet.TypeSetter):
-		def __init__(self, balanced=True):
-			super().__init__(layer = 0, cutOrder = 0, name='default', simple=True)
-			self.balanced = balanced
-			#self.columns = 2
-			self.width = 17*cm
-			self.height = 25*cm
-			self.colSep = 1*cm
-			self.colWidth = (self.width - self.colSep) // 2
-			# top-left corner
-			self.x = 1*cm
-			self.y = 1*cm
-		# a in [0,1] 
-		def geometry(self, a):
-			if self.balanced:
-				h0 = a
-				h1 = a
-			else:
-				a *= 2
-				h0 = min(1, a-0)
-				h1 = min(1, a-1)
-			return [xet.Rectangle(top=self.y, left=self.x, width=self.colWidth, height=self.height*h0),
-				et.Rectangle(top=self.y, left=self.x+self.colWidth+sel.colSep, width=self.colWidth, height=self.height*h1)]
-				
-				
+class MainText(xet.TypeSetter):
+	def __init__(self, balanced=True):
+		super().__init__(layer = 0, cutOrder = 0, name='default', simple=True)
+		self.balanced = balanced
+		#self.columns = 2
+		self.width = 17*cm
+		self.height = 25*cm
+		self.colSep = 1*cm
+		self.colWidth = (self.width - self.colSep) // 2
+		# top-left corner
+		self.x = 1*cm
+		self.y = 1*cm
+	# a in [0,1] 
+	def geometry(self, a):
+		if self.balanced:
+			h0 = a
+			h1 = a
+		else:
+			a *= 2
+			h0 = min(1, a-0)
+			h1 = min(1, a-1)
+		return [xet.Rectangle(top=self.y, left=self.x, width=self.colWidth, height=self.height*h0),
+			et.Rectangle(top=self.y, left=self.x+self.colWidth+sel.colSep, width=self.colWidth, height=self.height*h1)]
+			
+			
 #	@firstpage
-	class NormalPage(xet.Page):
-		def __init__(self, **kwds):
-			super().__init__(width=210*mm, height=297*mm, **kwds)
-			self.mainText = MainText()
-			#super().setTypeSetter(self.mainText)
-	
-		def nextPage(self):
-			return NormalPage()
+class NormalPage(xet.Page):
+	def __init__(self, **kwds):
+		super().__init__(width=210*mm, height=297*mm, **kwds)
+		self.mainText = MainText()
+		#super().setTypeSetter(self.mainText)
+
+	def nextPage(self):
+		return NormalPage()
 		
 
 
