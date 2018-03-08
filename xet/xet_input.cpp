@@ -65,9 +65,18 @@ Penalty::operator std::u32string() const
 
 ParagraphSeperator::operator std::u32string() const
 {
-	return U"<xet.ParagraphSeperator"s;
+	return U"xet.ParagraphSeperator"s;
 }
 
+Push::operator std::u32string() const
+{
+	return U"xet.Push"s;
+}
+
+Pop::operator std::u32string() const
+{
+	return U"xet.Pop"s;
+}
 
 class TokenVisitor : public boost::static_visitor<>
 {
@@ -122,7 +131,7 @@ public:
 		{
 			m_tokens.emplace_back(input::Text(py::cast<std::u32string>(r)));
 		}
-		else if (py::isinstance<input::Text>(r) || py::isinstance<input::Glue>(r) || py::isinstance<input::Penalty>(r) || py::isinstance<input::ParagraphSeperator>(r))
+		else if (py::isinstance<input::Text>(r) || py::isinstance<input::Glue>(r) || py::isinstance<input::Penalty>(r) || py::isinstance<input::ParagraphSeperator>(r) || py::isinstance<input::Push>(r) || py::isinstance<input::Pop>(r))
 		{
 			auto t = py::cast<input::Token>(r);
 			m_tokens.push_back(t);

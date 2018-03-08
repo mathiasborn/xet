@@ -117,7 +117,27 @@ public:
 	operator std::u32string() const;
 };
 
-typedef std::variant<ParagraphSeperator, Penalty, Glue, Text, ActiveToken> Token;
+class Push
+{
+public:
+	friend bool operator==(const Push&, const Push&)
+	{
+		return true;
+	}
+	operator std::u32string() const;
+};
+
+class Pop
+{
+public:
+	friend bool operator==(const Pop&, const Pop&)
+	{
+		return true;
+	}
+	operator std::u32string() const;
+};
+
+typedef std::variant<ParagraphSeperator, Penalty, Glue, Text, ActiveToken, Push, Pop> Token;
 typedef std::vector<Token> Tokens;
 typedef std::shared_ptr<Tokens> PTokens;
 typedef std::vector<PTokens> Groups;

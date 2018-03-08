@@ -64,6 +64,13 @@ def section(group=None):
 	t.append(xet.Glue(0, 0, 0))
 	return t
 
+@cs(1)
+def grp(group):
+	t = xet.Tokens()
+	t.append(xet.Push())
+	t.extend(group)
+	t.append(xet.Pop())
+	return t
 
 @cs
 def par():
@@ -93,5 +100,5 @@ This is some text in the center of the page.
 #}
 
 
-#\group{\fs(24) blah blah}
+\grp{fs(24) blah blah}
 

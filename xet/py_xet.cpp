@@ -226,6 +226,14 @@ PYBIND11_MODULE(xet, m)
 		.def(py::init<>())
 		.def("__repr__", [](input::ParagraphSeperator const& a){ return static_cast<std::u32string>(a); });
 
+	py::class_<input::Push>(m, "Push")
+		.def(py::init<>())
+		.def("__repr__", [](input::Push const& a){ return static_cast<std::u32string>(a); });
+
+	py::class_<input::Pop>(m, "Pop")
+		.def(py::init<>())
+		.def("__repr__", [](input::Pop const& a){ return static_cast<std::u32string>(a); });
+
 	py::class_<input::ActiveToken>(m, "ActiveToken")
 		.def("__repr__", [](input::ActiveToken const& a){ return static_cast<std::u32string>(a); });
 
