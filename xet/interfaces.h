@@ -57,7 +57,7 @@ public:
 	
 	TypeSetter(int32_t layer, int32_t cutOrder, std::u32string name, bool simple):
 		Super(layer, cutOrder), m_name(name), m_simple(simple) {};
-	virtual PCPolygonSet geometry(double a) = 0;
+	virtual CPolygonSets geometry(double a) = 0;
 private:
 	std::u32string m_name;
 	bool m_simple = false;

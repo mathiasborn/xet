@@ -146,10 +146,10 @@ class PyTypeSetter: public xet::TypeSetter
 public:
 	using TypeSetter::TypeSetter;	// Inherit the constructors
 
-	xet::PCPolygonSet geometry(double a) override
+	xet::CPolygonSets geometry(double a) override
 	{
 		PYBIND11_OVERLOAD_PURE(
-			xet::PCPolygonSet,	// Return type
+			xet::CPolygonSets,	// Return type
 			xet::TypeSetter,	// Parent class
 			geometry,			// Name of function in C++ (must match Python name)
 			a					// Argument(s)

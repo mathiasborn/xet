@@ -41,11 +41,11 @@ namespace xet {
 typedef gtl::polygon_data<Size> Polygon;
 typedef gtl::rectangle_data<Size> Rectangle;
 typedef gtl::polygon_set_data<Size> PolygonSet;
-typedef std::vector<PolygonSet> PolygonSets;
 typedef gtl::polygon_traits<Polygon>::point_type Point;
 
 class CPolygonSet;
 typedef boost::intrusive_ptr<CPolygonSet> PCPolygonSet;
+typedef std::vector<PCPolygonSet> CPolygonSets;
 
 
 class CPolygonSet: public boost::intrusive_ref_counter<CPolygonSet, boost::thread_unsafe_counter>
