@@ -163,7 +163,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="font.h" />
     <ClInclude Include="gtl_tests.h" />
     <ClInclude Include="interfaces.h" />
     <ClInclude Include="platform.h" />
@@ -175,6 +174,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="unicode_string_support.h" />
     <ClInclude Include="xet_document.h" />
+    <ClInclude Include="xet_font.h" />
     <ClInclude Include="xet_geometry.h" />
     <ClInclude Include="xet_input.h" />
     <ClInclude Include="xet_input_error.h" />
@@ -198,6 +198,7 @@
     <ClCompile Include="unicode_string_support.cpp" />
     <ClCompile Include="xet.cpp" />
     <ClCompile Include="xet_document.cpp" />
+    <ClCompile Include="xet_font.cpp" />
     <ClCompile Include="xet_geometry.cpp" />
     <ClCompile Include="xet_input.cpp" />
     <ClCompile Include="xet_input_error.cpp" />
