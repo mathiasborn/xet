@@ -6,6 +6,7 @@
 #include <harfbuzz/hb-ft.h>
 #include <boost/smart_ptr/intrusive_ptr.hpp>
 #include <boost/smart_ptr/intrusive_ref_counter.hpp>
+#include "xet_geometry.h"
 
 
 namespace xet {
@@ -31,6 +32,18 @@ public:
 private:
 	std::vector<PFont> m_fonts;
 };
+
+struct GlyphInfo
+{
+	uint32_t codePoint;
+	uint32_t cluster;
+	Size xAdvance;
+	Size yAdvance;
+	Size xOffset;
+	Size yOffset;
+};
+
+typedef std::vector<GlyphInfo> GlyphInfos;
 
 
 

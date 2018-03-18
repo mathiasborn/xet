@@ -7,6 +7,10 @@ left = 0
 center = 1
 right = 2
 
+# streams
+main = 0
+nonsense = 1
+
 t1 = xet.TestClass()
 
 class MainText(xet.TypeSetter):
@@ -76,9 +80,15 @@ def grp(group):
 def par():
 	return xet.ParagraphSeperator()
 
+@cs
+def stream(n):
+	return xet.Stream(n)
+
 }
 
 # The next input creates the first real contents, which creates a new page, because no page exists yet
+
+\stream(main)
 
 \section{The first section}
 
@@ -89,6 +99,7 @@ foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar
 #\ref(fig.test1) hallo
 \par
 
+\stream(1)
 
 
 \frame(pos=center, width=5*xet.cm) {

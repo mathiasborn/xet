@@ -50,5 +50,4 @@ PFont FontRegistry::font(fs::path const& path, int size)
 	return r;
 }
 
-
 }	// namespace xet

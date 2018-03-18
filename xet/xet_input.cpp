@@ -78,6 +78,12 @@ Pop::operator std::u32string() const
 	return U"xet.Pop"s;
 }
 
+Stream::operator std::u32string() const
+{
+	return U"xet.Stream("s + uts::toUtf32(m_n) + U')';
+}
+
+
 class TokenVisitor : public boost::static_visitor<>
 {
 	Tokens& m_tokens;

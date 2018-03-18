@@ -137,7 +137,21 @@ public:
 	operator std::u32string() const;
 };
 
-typedef std::variant<ParagraphSeperator, Penalty, Glue, Text, ActiveToken, Push, Pop> Token;
+class Stream
+{
+public:
+	Stream(int32_t n = 0): m_n(n) {};
+	friend bool operator==(const Stream& lhs, const Stream& rhs)
+	{
+		return lhs.m_n == rhs.m_n;
+	}
+	operator std::u32string() const;
+private:
+	int32_t m_n;
+};
+
+
+typedef std::variant<ParagraphSeperator, Penalty, Glue, Text, ActiveToken, Push, Pop, Stream> Token;
 typedef std::vector<Token> Tokens;
 typedef std::shared_ptr<Tokens> PTokens;
 typedef std::vector<PTokens> Groups;

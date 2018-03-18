@@ -234,6 +234,10 @@ PYBIND11_MODULE(xet, m)
 		.def(py::init<>())
 		.def("__repr__", [](input::Pop const& a){ return static_cast<std::u32string>(a); });
 
+	py::class_<input::Stream>(m, "Stream")
+		.def(py::init<int32_t>(), "n"_a)
+		.def("__repr__", [](input::Stream const& a){ return static_cast<std::u32string>(a); });
+
 	py::class_<input::ActiveToken>(m, "ActiveToken")
 		.def("__repr__", [](input::ActiveToken const& a){ return static_cast<std::u32string>(a); });
 
