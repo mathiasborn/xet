@@ -197,7 +197,7 @@ PYBIND11_MODULE(xet, m)
 		.def("__call__", py::overload_cast<unsigned int>(&xet::CSDecorator::operator()))
 		.def("__call__", py::overload_cast<py::object>(&xet::CSDecorator::operator()));
 
-	py::class_<xet::Document>(m, "Document")
+	py::class_<xet::Document, xet::PDocument>(m, "Document")
 		.def(py::init<>())
 		.def("addInput", &xet::Document::addInput)
 		.def_property_readonly("tokens", &xet::Document::tokens);

@@ -5,6 +5,8 @@
 #include <forward_list>
 #include <tuple>
 #include <memory>
+#include <boost/smart_ptr/intrusive_ptr.hpp>
+#include <boost/smart_ptr/intrusive_ref_counter.hpp>
 #include <pybind11/pybind11.h>
 #include "xet_input.h"
 #include "xet_font.h"
@@ -13,7 +15,7 @@ namespace py = pybind11;
 
 namespace xet {
 
-class Document
+class Document: public boost::intrusive_ref_counter<Document, boost::thread_unsafe_counter>
 {
 public:
 	struct ControlSequence
@@ -42,6 +44,9 @@ private:
 	input::PTokens m_tokens = std::make_shared<input::Tokens>();
 	FontRegistry m_fontRegistry;
 };
+
+typedef boost::intrusive_ptr<Document> PDocument;
+
 
 class CSDecoratorFromArgs
 {
