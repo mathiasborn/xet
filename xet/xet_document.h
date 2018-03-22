@@ -21,7 +21,10 @@ public:
 	struct ControlSequence
 	{
 		py::object callable;
-		unsigned int groups;
+		bool m_callWithDocument;
+		int m_minGroups, n_maxGroups;
+		bool callWithGroups() const { return m_minGroups >= 0; }
+		
 	};
 	typedef std::unordered_map<std::u32string, ControlSequence> ControlSequences;
 
