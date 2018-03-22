@@ -20,11 +20,15 @@ class Document: public boost::intrusive_ref_counter<Document, boost::thread_unsa
 public:
 	struct ControlSequence
 	{
-		py::object callable;
+		ControlSequence(py::object& callable);
+		ControlSequence(ControlSequence const&) = default;
+		ControlSequence(ControlSequence&&) = default;
+		ControlSequence& operator=(ControlSequence const&) = default;
+		ControlSequence& operator=(ControlSequence&&) = default;
+		py::object m_callable;
 		bool m_callWithDocument;
 		int m_minGroups, n_maxGroups;
 		bool callWithGroups() const { return m_minGroups >= 0; }
-		
 	};
 	typedef std::unordered_map<std::u32string, ControlSequence> ControlSequences;
 
@@ -54,13 +58,13 @@ typedef boost::intrusive_ptr<Document> PDocument;
 class CSDecoratorFromArgs
 {
 public:
-	CSDecoratorFromArgs(Document::ControlSequences& seqs, std::u32string const& name, unsigned int groups = 0):
-		m_controlSequences(seqs), m_name(name), m_groups(groups) {};
+	CSDecoratorFromArgs(Document::ControlSequences& seqs, std::u32string const& name):
+		m_controlSequences(seqs), m_name(name) {};
 	py::object operator()(py::object);
 private:
 	Document::ControlSequences& m_controlSequences;
 	std::u32string m_name;
-	unsigned int m_groups;
+	//unsigned int m_groups;
 };
 
 class CSDecorator
@@ -69,8 +73,8 @@ public:
 	CSDecorator(Document::ControlSequences& seqs): m_controlSequences(seqs) {};
 	py::object operator()(py::object);
 	CSDecoratorFromArgs operator()(std::u32string const&);
-	CSDecoratorFromArgs operator()(std::u32string const&, unsigned int groups);
-	CSDecoratorFromArgs operator()(unsigned int groups);
+	//CSDecoratorFromArgs operator()(std::u32string const&, unsigned int groups);
+	//CSDecoratorFromArgs operator()(unsigned int groups);
 private:
 	Document::ControlSequences& m_controlSequences;
 };

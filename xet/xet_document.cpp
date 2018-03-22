@@ -86,40 +86,56 @@ GlyphInfos Document::shape(Font& font, std::u32string const& text)
 	}
 }
 
+Document::ControlSequence::ControlSequence(py::object& callable): m_callable(callable)
+{
+	auto inspect = py::module::import("inspect");
+	auto sig = inspect.attr("signature")(callable);
+	bool kwargs = false;
+	for (auto param: sig.attr("parameters").attr("values")())
+	{
+		if (param.attr("kind").is(param.attr("VAR_KEYWORD")))
+		{
+			kwargs = true;
+			break;
+		}
+	}
+	if 'document' in sig.parameters:
+	r['document'] = sig.parameters['document'].annotation
+		elif kwargs:
+	r['document'] = None
+
+
+
+
+}
+
+
+
 
 py::object CSDecoratorFromArgs::operator()(py::object o)
 {
 	if (m_name.empty())
 	{
 		auto name = py::cast<std::u32string>(o.attr("__name__"));
-		m_controlSequences.insert_or_assign(name, Document::ControlSequence{o, m_groups});
+		m_controlSequences.insert_or_assign(name, Document::ControlSequence{o});
 	}
 	else
-		m_controlSequences.insert_or_assign(m_name, Document::ControlSequence{o, m_groups});
+		m_controlSequences.insert_or_assign(m_name, Document::ControlSequence{o});
 	return o;
 }
 
 py::object CSDecorator::operator()(py::object o)
 {
 	auto name = py::cast<std::u32string>(o.attr("__name__"));
-	m_controlSequences.insert_or_assign(name, Document::ControlSequence{o, 0});
+	m_controlSequences.insert_or_assign(name, Document::ControlSequence{o});
 	return o;
 }
 
 CSDecoratorFromArgs CSDecorator::operator()(std::u32string const& name)
 {
-	return {m_controlSequences, name, 0};
+	return {m_controlSequences, name};
 }
 
-CSDecoratorFromArgs CSDecorator::operator()(std::u32string const& name, unsigned int groups)
-{
-	return {m_controlSequences, name, groups};
-}
-
-CSDecoratorFromArgs CSDecorator::operator()(unsigned int groups)
-{
-	return {m_controlSequences, {}, groups};
-}
 
 
 }	// namespace xet
