@@ -83,6 +83,10 @@ Stream::operator std::u32string() const
 	return U"xet.Stream("s + uts::toUtf32(m_n) + U')';
 }
 
+InitialPage::operator std::u32string() const
+{
+	return U"xet.InitialPage"s;
+}
 
 class TokenVisitor : public boost::static_visitor<>
 {
@@ -114,30 +118,34 @@ public:
 		py::object r;
 		py::dict args_dict;
 		if (a.cs.args)
+		{
 			args_dict = m_eval(U"___f___"s + std::u32string{ a.cs.args->begin(), a.cs.args->end() }, m_doc.environment(), m_argsConverter);
+			if (args_dict.contains("document") || args_dict.contains("groups"))
+				throw Error(m_fileName, a.cs.name.begin(), U"Control sequence '"s + name + U"': Parameters 'document' and 'groups' not allowed here.");
+		}
 		Groups groups;
 		groups.reserve(a.groups.size());
 		for(auto const& group: a.groups) groups.push_back(convert(group, m_path, m_doc));
-		if (csi->second.groups == 1)
+		if (csi->second.callWithGroups())
 		{
-			if (a.groups.size() != 1)
-				throw Error(m_fileName, a.cs.name.begin(), U"Control sequence '"s + name + U"' requires one group, but " + uts::toUtf32(a.groups.size()) + U" is/are given.");
-			args_dict["group"] = groups[0];
-		}
-		else if (csi->second.groups > 1)
-		{
-			if (a.groups.size() != csi->second.groups)
-				throw Error(m_fileName, a.cs.name.begin(), U"Control sequence '"s + name + U"' requires " + uts::toUtf32(csi->second.groups) + U" groups, but " + uts::toUtf32(a.groups.size()) + U" is/are given.");
+			if (static_cast<int>(a.groups.size()) < csi->second.m_minGroups)
+				throw Error(m_fileName, a.cs.name.begin(), U"Control sequence '"s + name + U"' requires at least " + uts::toUtf32(csi->second.m_minGroups) + U" group(s), but " + uts::toUtf32(a.groups.size()) + U" is/are given.");
+			if (static_cast<int>(a.groups.size()) > csi->second.m_maxGroups)
+				throw Error(m_fileName, a.cs.name.begin(), U"Control sequence '"s + name + U"' accepts at most " + uts::toUtf32(csi->second.m_maxGroups) + U" group(s), but " + uts::toUtf32(a.groups.size()) + U" is/are given.");
 			args_dict["groups"] = groups;
 		}
+		else if (!groups.empty())
+			throw Error(m_fileName, a.cs.name.begin(), U"Control sequence '"s + name + U"' does not accept groups, but " + uts::toUtf32(groups.size()) + U" is/are given.");
 		
-		r = csi->second.callable(**args_dict);
+		if (csi->second.m_callWithDocument)
+			args_dict["document"] = m_doc;
+		r = csi->second.m_callable(**args_dict);
 		
 		if (py::isinstance<py::str>(r))
 		{
 			m_tokens.emplace_back(input::Text(py::cast<std::u32string>(r)));
 		}
-		else if (py::isinstance<input::Text>(r) || py::isinstance<input::Glue>(r) || py::isinstance<input::Penalty>(r) || py::isinstance<input::ParagraphSeperator>(r) || py::isinstance<input::Push>(r) || py::isinstance<input::Pop>(r))
+		else if (py::isinstance<input::Text>(r) || py::isinstance<input::Glue>(r) || py::isinstance<input::Penalty>(r) || py::isinstance<input::ParagraphSeperator>(r) || py::isinstance<input::Push>(r) || py::isinstance<input::Pop>(r) || py::isinstance<input::Stream>(r) || py::isinstance<input::InitialPage>(r))
 		{
 			auto t = py::cast<input::Token>(r);
 			m_tokens.push_back(t);

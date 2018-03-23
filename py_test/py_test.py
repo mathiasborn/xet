@@ -17,4 +17,6 @@ print(len(d.tokens))
 for t in d.tokens:
 	print(t)
 
-
+f = d.tokens[0]
+ip = f(d)
+print(ip)

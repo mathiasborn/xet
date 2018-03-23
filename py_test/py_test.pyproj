@@ -5,12 +5,12 @@
     <ProjectGuid>c8fd8554-06a6-4731-b3da-faff3bde02bd</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartupFile>py_test.py</StartupFile>
-    <SearchPath>..\Debug;..\x64\Debug</SearchPath>
+    <SearchPath>..\x64\Debug</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>py_test</Name>
     <RootNamespace>py_test</RootNamespace>
-    <InterpreterId>Global|VisualStudio|Python-3.6.4</InterpreterId>
+    <InterpreterId>Global|VisualStudio|Python-3.6.4.x64</InterpreterId>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <EnableNativeCodeDebugging>True</EnableNativeCodeDebugging>
     <Environment>PATH=C:\cpp\boost_1_66_0\stage\lib;%PATH%</Environment>
@@ -27,7 +27,7 @@
     <Compile Include="py_test.py" />
   </ItemGroup>
   <ItemGroup>
-    <InterpreterReference Include="Global|VisualStudio|Python-3.6.4" />
+    <InterpreterReference Include="Global|VisualStudio|Python-3.6.4.x64" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

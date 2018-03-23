@@ -40,39 +40,44 @@ class MainText(xet.TypeSetter):
 			
 #	@firstpage
 class NormalPage(xet.Page):
-	def __init__(self, **kwds):
+	def __init__(self, document, **kwds):
 		super().__init__(width=210*mm, height=297*mm, **kwds)
 		self.mainText = MainText()
 		#super().setTypeSetter(self.mainText)
+		print('Hallo', self)
 
 	def nextPage(self):
 		return NormalPage()
 		
+@cs
+def layout(name):
+	def factory(document):
+		return name(document = document)
+	return xet.InitialPage(factory)
 
-
-@cs('frame', 1)
+@cs('frame')
 class CSFrame(xet.Actor):
-	def __init__(self, pos=center, width=0, group=None):
+	def __init__(self, groups:1, document, pos=center, width=0):
 		super().__init__()
 		self.pos = pos
 		self.width = width
-		self.group = group
+		self.group = groups[0]
 
 @cs('logo')
 def CSLogo():
 	return 'xet'
 
-@cs(1)
-def section(group=None):
+@cs
+def section(groups:1):
 	t = xet.Tokens()
 	t.append(xet.Glue(0, 0, 0))
 	return t
 
-@cs(1)
-def grp(group):
+@cs
+def grp(groups:1):
 	t = xet.Tokens()
 	t.append(xet.Push())
-	t.extend(group)
+	t.extend(groups[0])
 	t.append(xet.Pop())
 	return t
 
@@ -81,14 +86,18 @@ def par():
 	return xet.ParagraphSeperator()
 
 @cs
-def stream(n):
-	return xet.Stream(n)
+def stream(id):
+	return xet.Stream(id)
 
 }
 
+\layout(name=NormalPage)
+
+# \layout(name=NormalPage)
+
 # The next input creates the first real contents, which creates a new page, because no page exists yet
 
-\stream(main)
+\stream(id=main)
 
 \section{The first section}
 
@@ -99,7 +108,7 @@ foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar
 #\ref(fig.test1) hallo
 \par
 
-\stream(1)
+\stream(id=1)
 
 
 \frame(pos=center, width=5*xet.cm) {

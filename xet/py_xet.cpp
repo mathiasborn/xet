@@ -21,6 +21,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl_bind.h>
 #include <pybind11/stl.h>
+#include <pybind11/functional.h>
 #include <fcntl.h>
 #include "py_xet.h"
 #include "unicode_string_support.h"
@@ -193,13 +194,14 @@ PYBIND11_MODULE(xet, m)
 		.def("__call__", &xet::CSDecoratorFromArgs::operator());
 	py::class_<xet::CSDecorator>(m, "CSDecorator")
 		.def("__call__", py::overload_cast<std::u32string const&>(&xet::CSDecorator::operator()))
-		.def("__call__", py::overload_cast<std::u32string const&, unsigned int>(&xet::CSDecorator::operator()))
-		.def("__call__", py::overload_cast<unsigned int>(&xet::CSDecorator::operator()))
+		//.def("__call__", py::overload_cast<std::u32string const&, unsigned int>(&xet::CSDecorator::operator()))
+		//.def("__call__", py::overload_cast<unsigned int>(&xet::CSDecorator::operator()))
 		.def("__call__", py::overload_cast<py::object>(&xet::CSDecorator::operator()));
 
 	py::class_<xet::Document, xet::PDocument>(m, "Document")
 		.def(py::init<>())
 		.def("addInput", &xet::Document::addInput)
+		.def("setPageFactory", &xet::Document::setPageFactory)
 		.def_property_readonly("tokens", &xet::Document::tokens);
 
 	py::class_<input::Actor, PyActor, input::PActor>(m, "Actor")
@@ -237,6 +239,11 @@ PYBIND11_MODULE(xet, m)
 	py::class_<input::Stream>(m, "Stream")
 		.def(py::init<int32_t>(), "n"_a)
 		.def("__repr__", [](input::Stream const& a){ return static_cast<std::u32string>(a); });
+
+	py::class_<input::InitialPage>(m, "InitialPage")
+		.def(py::init<std::function<xet::PPage(xet::PDocument)> const&>(), "factory"_a)
+		.def("__call__", &input::InitialPage::operator())
+		.def("__repr__", [](input::InitialPage const& a){ return static_cast<std::u32string>(a); });
 
 	py::class_<input::ActiveToken>(m, "ActiveToken")
 		.def("__repr__", [](input::ActiveToken const& a){ return static_cast<std::u32string>(a); });

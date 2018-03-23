@@ -1,4 +1,6 @@
 #include "stdafx.h"
+#include <utility>
+#include <limits>
 #include <harfbuzz/hb.h>
 #include "xet_document.h"
 #include "xet_input.h"
@@ -39,7 +41,7 @@ void Document::addInput(fs::path const& fileName)
 	auto parseTokens = parser::parse(text.begin(), text.end());
 	auto tokens = input::convert(parseTokens, fileName, *this);
 	m_tokens->insert(m_tokens->end(), tokens->begin(), tokens->end());
-
+/*
 	std::cout << "=== t1 ===" << std::endl;
 	auto t1 = m_environment["t1"];
 	std::cout << py::cast<std::string>(py::str(t1)) << std::endl;
@@ -47,7 +49,19 @@ void Document::addInput(fs::path const& fileName)
 	std::cout << py::cast<std::string>(py::str(t1_class)) << std::endl;
 	auto t2 = t1_class(t1);
 	std::cout << py::cast<std::string>(py::str(t2)) << std::endl;
+*/
 }
+
+void Document::setPageFactory(py::object& initialPageFactory)
+{
+	if (m_initialPageFactory.is(py::none()))
+		m_initialPageFactory = initialPageFactory;
+	else
+		if (true)	// check whether there is already any contents
+			throw std::runtime_error("Invalid attempt to set initial page factory.");
+}
+
+
 
 GlyphInfos Document::shape(Font& font, std::u32string const& text)
 {
@@ -91,7 +105,9 @@ Document::ControlSequence::ControlSequence(py::object& callable): m_callable(cal
 	auto inspect = py::module::import("inspect");
 	auto sig = inspect.attr("signature")(callable);
 	bool kwargs = false;
-	for (auto param: sig.attr("parameters").attr("values")())
+	//py::dict params = py::cast<py::dict>(sig.attr("parameters"));
+	auto params = sig.attr("parameters");
+	for (auto param: params.attr("values")())
 	{
 		if (param.attr("kind").is(param.attr("VAR_KEYWORD")))
 		{
@@ -99,18 +115,55 @@ Document::ControlSequence::ControlSequence(py::object& callable): m_callable(cal
 			break;
 		}
 	}
-	if 'document' in sig.parameters:
-	r['document'] = sig.parameters['document'].annotation
-		elif kwargs:
-	r['document'] = None
-
-
-
-
+	m_callWithDocument = params.contains("document") || kwargs;
+	if (params.contains("groups"))
+	{
+		m_groupsRequested = true;
+		py::object param = params["groups"];
+		py::object anno = param.attr("annotation");
+		if (py::isinstance<py::int_>(anno))
+		{
+			int n = py::cast<int>(anno);
+			m_minGroups = n < 0 ? -1 : n;
+			m_maxGroups = m_minGroups;
+		}
+		else if (py::isinstance<py::sequence>(anno))
+		{
+			auto s = py::sequence(anno);
+			if (py::len(s) != 2)
+				throw std::invalid_argument("If annotation for parameter 'groups' is a sequence, its length must be 2.");
+			m_minGroups = py::cast<int>(s[0]);
+			m_maxGroups = py::cast<int>(s[1]);
+			if (m_minGroups > m_maxGroups) std::swap(m_minGroups, m_maxGroups);
+			if (m_maxGroups <= 0)
+			{
+				m_minGroups = -1;
+				m_maxGroups = -1;
+			}
+		}
+		else if (anno.is(param.attr("empty")))
+		{
+			m_minGroups = 0;
+			m_maxGroups = std::numeric_limits<int>::max();
+		}
+		else
+			throw std::invalid_argument("Invalid annotation for parameter 'groups'.");
+	}
+	else
+	{
+		m_groupsRequested = false;
+		if (kwargs)
+		{
+			m_minGroups = 0;
+			m_maxGroups = std::numeric_limits<int>::max();
+		}
+		else
+		{
+			m_minGroups = -1;
+			m_maxGroups = -1;
+		}
+	}
 }
-
-
-
 
 py::object CSDecoratorFromArgs::operator()(py::object o)
 {

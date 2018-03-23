@@ -10,6 +10,7 @@
 #include <pybind11/pybind11.h>
 #include "xet_input.h"
 #include "xet_font.h"
+#include "interfaces.h"
 
 namespace py = pybind11;
 
@@ -27,14 +28,16 @@ public:
 		ControlSequence& operator=(ControlSequence&&) = default;
 		py::object m_callable;
 		bool m_callWithDocument;
-		int m_minGroups, n_maxGroups;
-		bool callWithGroups() const { return m_minGroups >= 0; }
+		int m_minGroups, m_maxGroups;
+		bool m_groupsRequested;
+		bool callWithGroups() const { return m_groupsRequested || m_minGroups >= 0; }
 	};
 	typedef std::unordered_map<std::u32string, ControlSequence> ControlSequences;
 
 	Document();
 
 	void addInput(fs::path const& fileName);
+	void setPageFactory(py::object& initialPageFactory);
 
 	ControlSequences& controlSequences() { return m_controlSequences; }
 	py::dict& environment() { return m_environment; }
@@ -50,9 +53,10 @@ private:
 	std::forward_list<std::tuple<fs::path, std::u32string>> m_inputs;
 	input::PTokens m_tokens = std::make_shared<input::Tokens>();
 	FontRegistry m_fontRegistry;
+	py::object m_initialPageFactory = py::none{};
 };
 
-typedef boost::intrusive_ptr<Document> PDocument;
+//typedef boost::intrusive_ptr<Document> PDocument;
 
 
 class CSDecoratorFromArgs

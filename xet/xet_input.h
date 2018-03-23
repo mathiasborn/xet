@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <variant>
+#include <functional>
 #include <boost/filesystem.hpp>
 #include <boost/smart_ptr/intrusive_ptr.hpp>
 #include <boost/smart_ptr/intrusive_ref_counter.hpp>
@@ -15,6 +16,7 @@ namespace py = pybind11;
 
 namespace xet {
 class Document;
+typedef boost::intrusive_ptr<Document> PDocument;
 }
 
 
@@ -150,8 +152,24 @@ private:
 	int32_t m_n;
 };
 
+class InitialPage
+{
+public:
+	InitialPage(std::function<xet::PPage(xet::PDocument)> const& factory): m_factory(factory) {};
+	friend bool operator==(const InitialPage& lhs, const InitialPage& rhs)
+	{
+		return lhs.m_factory.target<xet::PPage(xet::PDocument)>() == rhs.m_factory.target<xet::PPage(xet::PDocument)>();
+	}
+	operator std::u32string() const;
+	xet::PPage operator()(xet::PDocument doc) { return m_factory(doc); }
+private:
+	std::function<xet::PPage(xet::PDocument)> m_factory;
+};
 
-typedef std::variant<ParagraphSeperator, Penalty, Glue, Text, ActiveToken, Push, Pop, Stream> Token;
+
+
+
+typedef std::variant<ParagraphSeperator, Penalty, Glue, Text, ActiveToken, Push, Pop, Stream, InitialPage> Token;
 typedef std::vector<Token> Tokens;
 typedef std::shared_ptr<Tokens> PTokens;
 typedef std::vector<PTokens> Groups;
