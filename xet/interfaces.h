@@ -28,6 +28,7 @@ class VisibleCanvasElement: public boost::intrusive_ref_counter<VisibleCanvasEle
 {
 public:
 	VisibleCanvasElement(int32_t layer, int32_t cutOrder): m_layer(layer), m_cutOrder(cutOrder) {}
+	virtual ~VisibleCanvasElement() {};
 private:
 	int32_t m_layer = 0;	// z-coordinate (depth), elements with higher values appear on top of elements with lower values
 	int32_t m_cutOrder = 0;	// elements with higher m_cutOrder cut into elements with lower order (on the same layer)

@@ -20,4 +20,4 @@ for t in d.tokens:
 f = d.tokens[0]
 ip = f(d)
 print(ip)
-print(ip.mainText)
+#print(ip.mainText)
