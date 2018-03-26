@@ -100,6 +100,7 @@
       <CppLanguageStandard>c++1y</CppLanguageStandard>
       <AdditionalOptions>-Zm227 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,6 +119,7 @@
       <AdditionalIncludeDirectories>$(pybind11)/include;$(pdfwriter)/x64-Debug/include;$(python64)/PC;$(python64)/include;$(boost);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
