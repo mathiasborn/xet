@@ -161,7 +161,7 @@ public:
 		return lhs.m_factory.target<xet::PPage(xet::PDocument)>() == rhs.m_factory.target<xet::PPage(xet::PDocument)>();
 	}
 	operator std::u32string() const;
-	xet::PPage operator()(xet::PDocument doc) { return m_factory(doc); }
+	xet::PPage operator()(xet::PDocument doc);// { return m_factory(doc); }
 private:
 	std::function<xet::PPage(xet::PDocument)> m_factory;
 };

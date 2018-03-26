@@ -5,6 +5,8 @@
 #include "xet_document.h"
 #include "xet_input.h"
 
+PYBIND11_DECLARE_HOLDER_TYPE(T, boost::intrusive_ptr<T>, true);
+
 
 namespace xet {
 

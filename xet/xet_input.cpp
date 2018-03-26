@@ -19,6 +19,8 @@
 namespace py = pybind11;
 using namespace std::string_literals;
 
+PYBIND11_DECLARE_HOLDER_TYPE(T, boost::intrusive_ptr<T>, true);
+
 namespace input {
 
 std::u32string loadUTF8TextFile(fs::path const& path)
@@ -87,6 +89,12 @@ InitialPage::operator std::u32string() const
 {
 	return U"xet.InitialPage"s;
 }
+
+xet::PPage InitialPage::operator()(xet::PDocument doc)
+{
+	return m_factory(doc);
+}
+
 
 class TokenVisitor : public boost::static_visitor<>
 {

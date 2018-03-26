@@ -4,6 +4,8 @@
 #include <string>
 #include <tuple>
 #include <memory>
+#include <boost/smart_ptr/intrusive_ptr.hpp>
+#include <boost/smart_ptr/intrusive_ref_counter.hpp>
 #include "xet_geometry.h"
 
 namespace xet {
@@ -12,16 +14,17 @@ namespace xet {
 #define GETV(name) decltype(BOOST_PP_CAT(m_, name)) name() const { return BOOST_PP_CAT(m_, name); }
 
 
-class CanvasElement
+class CanvasElement: public boost::intrusive_ref_counter<CanvasElement, boost::thread_unsafe_counter>
 {
 public:
 	virtual ~CanvasElement() {};
 };
 
-typedef std::shared_ptr<CanvasElement> PCanvasElement;
+typedef boost::intrusive_ptr<CanvasElement> PCanvasElement;
+//typedef std::shared_ptr<CanvasElement> PCanvasElement;
 typedef std::vector<PCanvasElement> CanvasElements;
 
-class VisibleCanvasElement
+class VisibleCanvasElement: public boost::intrusive_ref_counter<VisibleCanvasElement, boost::thread_unsafe_counter>
 {
 public:
 	VisibleCanvasElement(int32_t layer, int32_t cutOrder): m_layer(layer), m_cutOrder(cutOrder) {}
@@ -65,7 +68,8 @@ public:
 	GETR(name)
 	GETV(simple)
 };
-typedef std::shared_ptr<TypeSetter> PTypeSetter;
+//typedef std::shared_ptr<TypeSetter> PTypeSetter;
+typedef boost::intrusive_ptr<TypeSetter> PTypeSetter;
 
 class Canvas: public VisibleCanvasElement
 {
@@ -81,7 +85,8 @@ public:
 };
 
 class Page;
-typedef std::shared_ptr<Page> PPage;
+//typedef std::shared_ptr<Page> PPage;
+typedef boost::intrusive_ptr<Page> PPage;
 
 class Page: public Canvas
 {

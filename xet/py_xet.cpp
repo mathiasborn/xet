@@ -208,6 +208,10 @@ PYBIND11_MODULE(xet, m)
 		.def(py::init<>())
 		.def("addedToPage", &input::Actor::addedToPage);
 
+	py::class_<xet::Page, PyPage, xet::PPage>(m, "Page")
+		.def(py::init<xet::Size, xet::Size>(), "width"_a, "height"_a)
+		.def("nextPage", &xet::Page::nextPage);
+
 	py::class_<input::Text>(m, "Text")
 		.def(py::init<std::u32string const&>(), "text"_a)
 		.def("__repr__", [](input::Text const& a){ return U"xet.Text('"s + a.text() + U"')"; })
@@ -251,10 +255,6 @@ PYBIND11_MODULE(xet, m)
 	py::class_<xet::TypeSetter, PyTypeSetter, xet::PTypeSetter>(m, "TypeSetter")
 		.def(py::init<int32_t, int32_t, std::u32string, bool>(), "layer"_a, "cutOrder"_a, "name"_a, "simple"_a)
 		.def("geometry", &xet::TypeSetter::geometry);
-
-	py::class_<xet::Page, PyPage, xet::PPage>(m, "Page")
-		.def(py::init<xet::Size, xet::Size>(), "width"_a, "height"_a)
-		.def("nextPage", &xet::Page::nextPage);
 
 	xet::pyInitGeometry(m);
 }

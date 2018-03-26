@@ -5,7 +5,11 @@
 
 #pragma once
 
+
+#if defined _MSC_VER
+#pragma warning(disable:4180)
 #define _CRT_SECURE_NO_WARNINGS
+#endif
 
 #include "targetver.h"
 
