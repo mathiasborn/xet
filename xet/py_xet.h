@@ -20,6 +20,8 @@
 #include "stdafx.h"
 #include "unicode_string_support.h"
 #include <boost/function.hpp>
+#include <boost/smart_ptr/intrusive_ptr.hpp>
+#include <boost/smart_ptr/intrusive_ref_counter.hpp>
 #include <pybind11/pybind11.h>
 
 namespace py = pybind11;
@@ -140,6 +142,8 @@ template<typename T>
 class PyObjectHolder: protected virtual PyObjectHolderBase
 {
 public:
+	typedef boost::intrusive_ptr<T> Pointer;
+
 	void _increaseRefCount()
 	{
 		if (m_pyObject)
@@ -148,7 +152,7 @@ public:
 		{
 			auto _this = static_cast<T*>(this);
 			try {
-				auto p = py::cast(_this, py::return_value_policy::take_ownership);
+				auto o = py::cast(_this, py::return_value_policy::take_ownership);
 				m_pyObject = o.release().ptr();
 			}
 			catch(...)
@@ -162,7 +166,14 @@ public:
 	}
 	void _decreaseRefCount() { Py_DECREF(m_pyObject); }
 	int refCount() const { return static_cast<int>(Py_REFCNT(m_pyObject)); }
-	void _assignWrap(PyObject* o) { m_pyObject = o; }
+	void _assignWrap(PyObject* o) noexcept { m_pyObject = o; }
+
+	static Pointer cast(py::object& o)
+	{
+		auto p = py::cast<T*>(o);
+		p->_assignWrap(o.release().ptr());
+		return {p, false};
+	}
 };
 
 template<typename T>

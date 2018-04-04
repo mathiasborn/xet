@@ -97,7 +97,7 @@ std::string pythonExceptionToText(py::error_already_set& e)
 }
 
 
-class TestClass
+class TestClass: public PyObjectHolder<TestClass>
 {
 public:
 	TestClass(TestClass const&)
@@ -108,8 +108,23 @@ public:
 	{
 		std::cout << "z=" << z << " width=" << width << " len(adjustment)=" << py::len(adjustment) << std::endl;
 	};
+	~TestClass()
+	{
+	}
 };
-typedef std::shared_ptr<TestClass> PTestClass;
+typedef TestClass::Pointer PTestClass;
+
+PTestClass createTestClass(py::object factory)
+{
+	py::object o = factory();
+/*
+	TestClass* p = py::cast<TestClass*>(o);
+	p->_assignWrap(o.release().ptr());
+	PTestClass r{p, false};
+*/
+	return TestClass::cast(o);
+	//return r;
+}
 
 /*
 class PyTestClass: public TestClass
@@ -182,10 +197,12 @@ PYBIND11_MODULE(xet, m)
 	m.attr("um") = 1'000;
 	m.attr("nm") = 1;
 
-	py::class_<TestClass, PTestClass> testClass(m, "TestClass");
+	py::class_<TestClass> testClass(m, "TestClass");
 	testClass
 		.def(py::init<TestClass const&>(), "other"_a)
 		.def(py::init<int, int64_t, py::tuple>(), "z"_a = 10, "width"_a = 100, "adjustment"_a = py::tuple{});
+
+	m.def("createTestClass", &createTestClass);
 
 	py::bind_vector<input::Tokens, input::PTokens>(m, "Tokens");
 	py::bind_vector<input::Groups>(m, "Groups");
