@@ -126,3 +126,53 @@ public:
 	}
 };
 } // namespace pybind11::detail
+
+class PyObjectHolderBase
+{
+protected:
+	PyObject* m_pyObject = nullptr;
+public:
+	virtual ~PyObjectHolderBase() {};
+};
+
+// to be used together with boost::intrusive_ptr
+template<typename T>
+class PyObjectHolder: protected virtual PyObjectHolderBase
+{
+public:
+	void _increaseRefCount()
+	{
+		if (m_pyObject)
+			Py_INCREF(m_pyObject);
+		else
+		{
+			auto _this = static_cast<T*>(this);
+			try {
+				auto p = py::cast(_this, py::return_value_policy::take_ownership);
+				m_pyObject = o.release().ptr();
+			}
+			catch(...)
+			{
+				// The instance could not be wrapped. This should not happen and indicates a bug.
+				// We know that the object has been created with "new", otherwise it couldn't be wrapped, thus we can safely "delete this" here.
+				delete this;
+				throw;
+			}
+		}
+	}
+	void _decreaseRefCount() { Py_DECREF(m_pyObject); }
+	int refCount() const { return static_cast<int>(Py_REFCNT(m_pyObject)); }
+	void _assignWrap(PyObject* o) { m_pyObject = o; }
+};
+
+template<typename T>
+inline void intrusive_ptr_add_ref(PyObjectHolder<T>* p)
+{
+	p->_increaseRefCount();
+}
+
+template<typename T>
+inline void intrusive_ptr_release(PyObjectHolder<T>* p)
+{
+	p->_decreaseRefCount();
+}
