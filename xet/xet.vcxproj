@@ -208,6 +208,7 @@
     <ClCompile Include="xet_geometry.cpp" />
     <ClCompile Include="xet_input.cpp" />
     <ClCompile Include="xet_input_error.cpp" />
+    <ClCompile Include="xet_page.cpp" />
     <ClCompile Include="xet_parser.cpp" />
     <ClCompile Include="xet_parser_skipper.cpp" />
   </ItemGroup>

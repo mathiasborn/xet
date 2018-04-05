@@ -122,7 +122,7 @@ PTestClass createTestClass(py::object factory)
 	p->_assignWrap(o.release().ptr());
 	PTestClass r{p, false};
 */
-	return TestClass::cast(o);
+	return TestClass::cast<TestClass>(o);
 	//return r;
 }
 
@@ -218,14 +218,14 @@ PYBIND11_MODULE(xet, m)
 	py::class_<xet::Document, xet::PDocument>(m, "Document")
 		.def(py::init<>())
 		.def("addInput", &xet::Document::addInput)
-		.def("setPageFactory", &xet::Document::setPageFactory)
+		.def("toPDF", &xet::Document::toPDF)
 		.def_property_readonly("tokens", &xet::Document::tokens);
 
 	py::class_<input::Actor, PyActor, input::PActor>(m, "Actor")
 		.def(py::init<>())
 		.def("addedToPage", &input::Actor::addedToPage);
 
-	py::class_<xet::Page, PyPage, xet::PPage>(m, "Page")
+	py::class_<xet::Page, PyPage>(m, "Page")
 		.def(py::init<xet::Size, xet::Size>(), "width"_a, "height"_a)
 		.def("nextPage", &xet::Page::nextPage);
 
@@ -262,14 +262,15 @@ PYBIND11_MODULE(xet, m)
 		.def("__repr__", [](input::Stream const& a){ return static_cast<std::u32string>(a); });
 
 	py::class_<input::InitialPage>(m, "InitialPage")
-		.def(py::init<std::function<xet::PPage(xet::PDocument)> const&>(), "factory"_a)
+		.def(py::init<std::function<py::object(xet::PDocument)> const&>(), "factory"_a)
+		//.def(py::init<std::function<xet::PPage(xet::PDocument)> const&>(), "factory"_a)
 		.def("__call__", &input::InitialPage::operator())
 		.def("__repr__", [](input::InitialPage const& a){ return static_cast<std::u32string>(a); });
 
 	py::class_<input::ActiveToken>(m, "ActiveToken")
 		.def("__repr__", [](input::ActiveToken const& a){ return static_cast<std::u32string>(a); });
 
-	py::class_<xet::TypeSetter, PyTypeSetter, xet::PTypeSetter>(m, "TypeSetter")
+	py::class_<xet::TypeSetter, PyTypeSetter>(m, "TypeSetter")
 		.def(py::init<int32_t, int32_t, std::u32string, bool>(), "layer"_a, "cutOrder"_a, "name"_a, "simple"_a)
 		.def("geometry", &xet::TypeSetter::geometry);
 

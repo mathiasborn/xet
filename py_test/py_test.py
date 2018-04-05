@@ -10,13 +10,6 @@ f = xet.Rectangle(top=0, left=0, width=10, height=20)
 #print(f)
 
 
-def f():
-    return xet.TestClass()
-
-k = xet.createTestClass(f)
-print(k)
-del k
-
 d = xet.Document()
 d.addInput('test.xet')
 
@@ -28,3 +21,4 @@ f = d.tokens[0]
 ip = f(d)
 print(ip)
 #print(ip.mainText)
+del ip

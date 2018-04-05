@@ -19,11 +19,6 @@ namespace pdf = PDFHummus;
 
 using namespace xet;
 
-constexpr double toPDF(int64_t u)
-{
-	return static_cast<double>(u)*(1.0e-9 / (2.54 / 100.0 / 72.0));	// nm -> 1/72in
-}
-
 constexpr int64_t operator "" _cm(unsigned long long int i) { return i * 10'000'000; }
 constexpr int64_t operator "" _mm(unsigned long long int i) { return i * 1'000'000; }
 constexpr int64_t operator "" _nm(unsigned long long int i) { return i; }

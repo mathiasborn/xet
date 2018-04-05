@@ -155,15 +155,15 @@ private:
 class InitialPage
 {
 public:
-	InitialPage(std::function<xet::PPage(xet::PDocument)> const& factory): m_factory(factory) {};
+	InitialPage(std::function<py::object(xet::PDocument)> const& factory): m_factory(factory) {};
 	friend bool operator==(const InitialPage& lhs, const InitialPage& rhs)
 	{
 		return lhs.m_factory.target<xet::PPage(xet::PDocument)>() == rhs.m_factory.target<xet::PPage(xet::PDocument)>();
 	}
 	operator std::u32string() const;
-	xet::PPage operator()(xet::PDocument doc);// { return m_factory(doc); }
+	xet::PPage operator()(xet::PDocument doc);
 private:
-	std::function<xet::PPage(xet::PDocument)> m_factory;
+	std::function<py::object(xet::PDocument)> m_factory;
 };
 
 

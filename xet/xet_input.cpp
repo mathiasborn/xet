@@ -92,7 +92,8 @@ InitialPage::operator std::u32string() const
 
 xet::PPage InitialPage::operator()(xet::PDocument doc)
 {
-	return m_factory(doc);
+	auto o = m_factory(doc);
+	return xet::Page::cast<xet::Page>(o);
 }
 
 

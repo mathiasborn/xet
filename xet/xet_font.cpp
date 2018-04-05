@@ -50,4 +50,16 @@ PFont FontRegistry::font(fs::path const& path, int size)
 	return r;
 }
 
+
+Shape::Shape(GlyphInfos&& infos): glyphInfos{std::move(infos)}
+{
+	for (auto const& glyph: glyphInfos)
+	{
+		height = std::max(height, glyph.height);
+		yBearing = std::max(yBearing, glyph.yBearing);
+		
+}
+
+
+
 }	// namespace xet

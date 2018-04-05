@@ -1,9 +1,13 @@
 #include "stdafx.h"
 #include <utility>
 #include <limits>
+#include <string>
 #include <harfbuzz/hb.h>
+#include <PDFWriter/PDFWriter.h>
 #include "xet_document.h"
 #include "xet_input.h"
+
+using namespace std::string_literals;
 
 PYBIND11_DECLARE_HOLDER_TYPE(T, boost::intrusive_ptr<T>, true);
 
@@ -54,15 +58,16 @@ void Document::addInput(fs::path const& fileName)
 */
 }
 
-void Document::setPageFactory(py::object& initialPageFactory)
+void Document::toPDF(fs::path const& fileName)
 {
-	if (m_initialPageFactory.is(py::none()))
-		m_initialPageFactory = initialPageFactory;
-	else
-		if (true)	// check whether there is already any contents
-			throw std::runtime_error("Invalid attempt to set initial page factory.");
-}
+	PDFWriter out;
+	auto file = uts::toUtf8(uts::toUtf32(fileName));
+	auto status = out.StartPDF(file, ePDFVersion13);
+	if (status != PDFHummus::eSuccess)
+		throw std::runtime_error("Unable to create file '"s + file + "'."s);
 
+	out.EndPDF();
+}
 
 
 GlyphInfos Document::shape(Font& font, std::u32string const& text)
@@ -91,6 +96,14 @@ GlyphInfos Document::shape(Font& font, std::u32string const& text)
 			v.yAdvance = pos[i].y_advance * 5512;
 			v.xOffset = pos[i].x_offset * 5512;
 			v.yOffset= pos[i].y_offset * 5512;
+
+			hb_glyph_extents_t x;
+			if (!hb_font_get_glyph_extents(font.m_hbFont, info[i].codepoint, &x))
+				throw std::runtime_error("Failed to determine glyph extents.");
+			v.xBearing = x.x_bearing * 5512;
+			v.yBearing = x.y_bearing * 5512;
+			v.width = x.width * 5512;
+			v.height = x.height * 5512;
 		}
 		hb_buffer_destroy(hb_buffer);
 		return r;

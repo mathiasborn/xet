@@ -6,6 +6,7 @@
 #include <memory>
 #include <boost/smart_ptr/intrusive_ptr.hpp>
 #include <boost/smart_ptr/intrusive_ref_counter.hpp>
+#include "py_xet.h"
 #include "xet_geometry.h"
 
 namespace xet {
@@ -24,7 +25,7 @@ typedef boost::intrusive_ptr<CanvasElement> PCanvasElement;
 //typedef std::shared_ptr<CanvasElement> PCanvasElement;
 typedef std::vector<PCanvasElement> CanvasElements;
 
-class VisibleCanvasElement: public boost::intrusive_ref_counter<VisibleCanvasElement, boost::thread_unsafe_counter>
+class VisibleCanvasElement: public PyObjectHolder<VisibleCanvasElement>
 {
 public:
 	VisibleCanvasElement(int32_t layer, int32_t cutOrder): m_layer(layer), m_cutOrder(cutOrder) {}
@@ -54,7 +55,7 @@ typedef std::shared_ptr<TextArea> PTextArea;
 typedef std::vector<PTextArea> TextAreas;
 */
 
-class TypeSetter: public VisibleCanvasElement
+class TypeSetter: public VisibleCanvasElement//, public PyObjectHolder<TypeSetter>
 {
 public:
 	typedef VisibleCanvasElement Super;
@@ -72,7 +73,7 @@ public:
 //typedef std::shared_ptr<TypeSetter> PTypeSetter;
 typedef boost::intrusive_ptr<TypeSetter> PTypeSetter;
 
-class Canvas: public VisibleCanvasElement
+class Canvas: public VisibleCanvasElement//, public PyObjectHolder<Canvas>
 {
 public:
 	typedef VisibleCanvasElement Super;
@@ -86,10 +87,9 @@ public:
 };
 
 class Page;
-//typedef std::shared_ptr<Page> PPage;
 typedef boost::intrusive_ptr<Page> PPage;
 
-class Page: public Canvas
+class Page: public Canvas//, public PyObjectHolder<Page>
 {
 public:
 	typedef Canvas Super;
@@ -97,6 +97,8 @@ public:
 	Page(Size width, Size height): m_width(width), m_height(height) {};
 	virtual PCPolygonSet geometry() { return {}; }
 	virtual PPage nextPage() = 0;
+
+	std::unique_ptr<PDFPage> toPDF();
 private:
 	Size m_width;
 	Size m_height;
@@ -104,6 +106,7 @@ public:
 	GETV(width)
 	GETV(height)
 };
+
 
 /*
 class ControlSequence

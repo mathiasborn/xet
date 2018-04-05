@@ -119,6 +119,9 @@
     <ClCompile Include="xet_font.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="xet_page.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="xet_test.py">

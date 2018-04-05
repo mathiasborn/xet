@@ -41,10 +41,23 @@ struct GlyphInfo
 	Size yAdvance;
 	Size xOffset;
 	Size yOffset;
+	Size xBearing;	// left side of glyph from origin.
+	Size yBearing;	// top side of glyph from origin.
+	Size width;		// distance from left to right side.
+	Size height;	// distance from top to bottom side.
 };
 
 typedef std::vector<GlyphInfo> GlyphInfos;
 
+struct Shape
+{
+	Shape(GlyphInfos&&);
+	
+	GlyphInfos glyphInfos;
+	Size width = 0;
+	Size yBearing = 0;
+	Size height = 0;
+};
 
 
 }	// namespace xet

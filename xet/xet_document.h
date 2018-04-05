@@ -37,7 +37,7 @@ public:
 	Document();
 
 	void addInput(fs::path const& fileName);
-	void setPageFactory(py::object& initialPageFactory);
+	void toPDF(fs::path const& fileName);
 
 	ControlSequences& controlSequences() { return m_controlSequences; }
 	py::dict& environment() { return m_environment; }
@@ -53,7 +53,6 @@ private:
 	std::forward_list<std::tuple<fs::path, std::u32string>> m_inputs;
 	input::PTokens m_tokens = std::make_shared<input::Tokens>();
 	FontRegistry m_fontRegistry;
-	py::object m_initialPageFactory = py::none{};
 };
 
 //typedef boost::intrusive_ptr<Document> PDocument;

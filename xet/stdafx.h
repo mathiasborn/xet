@@ -54,3 +54,8 @@ namespace qi = boost::spirit::qi;
 namespace boost {
 template<> struct is_scalar<std::u32string::const_iterator> : public true_type {};
 }
+
+constexpr double toPDF(int64_t u)
+{
+	return static_cast<double>(u)*(1.0e-9 / (2.54 / 100.0 / 72.0));	// nm -> 1/72in
+}

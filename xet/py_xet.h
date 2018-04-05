@@ -168,9 +168,10 @@ public:
 	int refCount() const { return static_cast<int>(Py_REFCNT(m_pyObject)); }
 	void _assignWrap(PyObject* o) noexcept { m_pyObject = o; }
 
-	static Pointer cast(py::object& o)
+	template<class P>
+	static boost::intrusive_ptr<P> cast(py::object& o)
 	{
-		auto p = py::cast<T*>(o);
+		auto p = py::cast<P*>(o);
 		p->_assignWrap(o.release().ptr());
 		return {p, false};
 	}
