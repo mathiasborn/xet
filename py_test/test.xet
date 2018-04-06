@@ -63,6 +63,16 @@ class CSFrame(xet.Actor):
 		self.width = width
 		self.group = groups[0]
 
+@cs('font')
+class CSFont(xet.Actor):
+	def __init__(self, document, path, size):
+		super().__init__()
+		self.font = document.font(path, size)
+	def addedToTypeSetter(self, ts):
+		ts.font = self.font
+
+
+
 @cs('logo')
 def CSLogo():
 	return 'xet'

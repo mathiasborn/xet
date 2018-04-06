@@ -29,6 +29,7 @@
 #include "xet_document.h"
 #include "xet_input.h"
 #include "xet_geometry.h"
+#include "xet_font.h"
 
 namespace py = pybind11;
 using namespace std::string_literals;
@@ -138,8 +139,8 @@ class PyActor: public input::Actor
 public:
 	/* Inherit the constructors */
 	using Actor::Actor;
-/*
-	void addedToPage(xet::PPage& page) override {
+
+	void addedToPage(xet::PPage page) override {
 		PYBIND11_OVERLOAD(
 			void,			// Return type
 			input::Actor,	// Parent class
@@ -147,12 +148,12 @@ public:
 			page			// Argument(s)
 		);
 	}
-*/
-	void addedToPage() override {
+	void addedToTypeSetter(xet::PTypeSetter typeSetter) override {
 		PYBIND11_OVERLOAD(
 			void,			// Return type
 			input::Actor,	// Parent class
-			addedToPage,	// Name of function in C++ (must match Python name)
+			addedToTypeSetter,	// Name of function in C++ (must match Python name)
+			typeSetter		// Argument(s)
 		);
 	}
 };
@@ -180,11 +181,14 @@ public:
 
 	xet::PPage nextPage() override
 	{
-		PYBIND11_OVERLOAD_PURE(
-			xet::PPage,			// Return type
-			xet::Page,			// Parent class
-			nextPage,			// Name of function in C++ (must match Python name)
-		);
+		py::gil_scoped_acquire gil;
+		auto overload = py::get_overload(this, "nextPage");
+		if (overload)
+		{
+			auto o = overload();
+			return cast<xet::Page>(o);
+		}
+		return {};
 	}
 };
 
@@ -207,6 +211,13 @@ PYBIND11_MODULE(xet, m)
 	py::bind_vector<input::Tokens, input::PTokens>(m, "Tokens");
 	py::bind_vector<input::Groups>(m, "Groups");
 
+	py::class_<xet::Font, xet::PFont>(m, "Font")
+		.def(py::init<fs::path const&, int>(), "path"_a, "size"_a)
+		.def_property_readonly("size", [](xet::Font const& self){ return self.m_ptSize; });
+
+	py::class_<xet::FontRegistry>(m, "FontRegistry")
+		.def("font", &xet::FontRegistry::font);
+
 	py::class_<xet::CSDecoratorFromArgs>(m, "CSDecoratorFromArgs")
 		.def("__call__", &xet::CSDecoratorFromArgs::operator());
 	py::class_<xet::CSDecorator>(m, "CSDecorator")
@@ -219,11 +230,13 @@ PYBIND11_MODULE(xet, m)
 		.def(py::init<>())
 		.def("addInput", &xet::Document::addInput)
 		.def("toPDF", &xet::Document::toPDF)
+		.def("font", &xet::Document::font)
 		.def_property_readonly("tokens", &xet::Document::tokens);
 
-	py::class_<input::Actor, PyActor, input::PActor>(m, "Actor")
+	py::class_<input::Actor, PyActor>(m, "Actor")
 		.def(py::init<>())
-		.def("addedToPage", &input::Actor::addedToPage);
+		.def("addedToPage", &input::Actor::addedToPage)
+		.def("addedToTypeSetter", &input::Actor::addedToTypeSetter);
 
 	py::class_<xet::Page, PyPage>(m, "Page")
 		.def(py::init<xet::Size, xet::Size>(), "width"_a, "height"_a)
@@ -272,7 +285,8 @@ PYBIND11_MODULE(xet, m)
 
 	py::class_<xet::TypeSetter, PyTypeSetter>(m, "TypeSetter")
 		.def(py::init<int32_t, int32_t, std::u32string, bool>(), "layer"_a, "cutOrder"_a, "name"_a, "simple"_a)
-		.def("geometry", &xet::TypeSetter::geometry);
+		.def("geometry", &xet::TypeSetter::geometry)
+		.def_property("font", &xet::TypeSetter::font, &xet::TypeSetter::setFont);
 
 	xet::pyInitGeometry(m);
 }

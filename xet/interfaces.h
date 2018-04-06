@@ -6,8 +6,10 @@
 #include <memory>
 #include <boost/smart_ptr/intrusive_ptr.hpp>
 #include <boost/smart_ptr/intrusive_ref_counter.hpp>
+#include <PDFWriter/PDFPage.h>
 #include "py_xet.h"
 #include "xet_geometry.h"
+#include "xet_font.h"
 
 namespace xet {
 
@@ -63,12 +65,18 @@ public:
 	TypeSetter(int32_t layer, int32_t cutOrder, std::u32string name, bool simple):
 		Super(layer, cutOrder), m_name(name), m_simple(simple) {};
 	virtual CPolygonSets geometry(double a) = 0;
+
+	// State changer during typesetting
+	void setFont(PFont f) { m_font = f; }
 private:
 	std::u32string m_name;
 	bool m_simple = false;
+	// state during typesetting
+	PFont m_font;
 public:
 	GETR(name)
 	GETV(simple)
+	GETV(font)
 };
 //typedef std::shared_ptr<TypeSetter> PTypeSetter;
 typedef boost::intrusive_ptr<TypeSetter> PTypeSetter;

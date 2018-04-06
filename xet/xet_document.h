@@ -45,14 +45,13 @@ public:
 
 	PFont font(fs::path const& path, int size) { return m_fontRegistry.font(path, size); }
 
-	GlyphInfos shape(Font& font, std::u32string const& text);
-
 private:
 	ControlSequences m_controlSequences;
 	py::dict m_environment;
 	std::forward_list<std::tuple<fs::path, std::u32string>> m_inputs;
 	input::PTokens m_tokens = std::make_shared<input::Tokens>();
 	FontRegistry m_fontRegistry;
+	input::InitialPage* m_initialPage = nullptr;
 };
 
 //typedef boost::intrusive_ptr<Document> PDocument;

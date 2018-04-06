@@ -69,52 +69,6 @@ void Document::toPDF(fs::path const& fileName)
 	out.EndPDF();
 }
 
-
-GlyphInfos Document::shape(Font& font, std::u32string const& text)
-{
-	hb_buffer_t* hb_buffer = hb_buffer_create();
-	hb_buffer_add_utf32(hb_buffer, reinterpret_cast<uint32_t const*>(&text[0]), static_cast<int>(text.size()), 0, static_cast<int>(text.size()));
-	hb_buffer_guess_segment_properties(hb_buffer);
-	hb_shape(font.m_hbFont, hb_buffer, NULL, 0);
-
-	// Get glyph information and positions out of the buffer.
-	unsigned int len = hb_buffer_get_length(hb_buffer);
-	hb_glyph_info_t *info = hb_buffer_get_glyph_infos(hb_buffer, NULL);
-	hb_glyph_position_t *pos = hb_buffer_get_glyph_positions(hb_buffer, NULL);
-
-	try
-	{
-		auto r = GlyphInfos(static_cast<size_t>(len));
-
-		for (unsigned int i = 0; i < len; i++)
-		{
-			auto& v = r[i];
-			v.codePoint = info[i].codepoint;
-			v.cluster = info[i].cluster;
-			// Positions come as (value in pt)*64. We convert here into nm: 2.54/100*1e9/72/64 = 5512.15277
-			v.xAdvance = pos[i].x_advance * 5512;
-			v.yAdvance = pos[i].y_advance * 5512;
-			v.xOffset = pos[i].x_offset * 5512;
-			v.yOffset= pos[i].y_offset * 5512;
-
-			hb_glyph_extents_t x;
-			if (!hb_font_get_glyph_extents(font.m_hbFont, info[i].codepoint, &x))
-				throw std::runtime_error("Failed to determine glyph extents.");
-			v.xBearing = x.x_bearing * 5512;
-			v.yBearing = x.y_bearing * 5512;
-			v.width = x.width * 5512;
-			v.height = x.height * 5512;
-		}
-		hb_buffer_destroy(hb_buffer);
-		return r;
-	}
-	catch(...)
-	{
-		hb_buffer_destroy(hb_buffer);
-		throw;
-	}
-}
-
 Document::ControlSequence::ControlSequence(py::object& callable): m_callable(callable)
 {
 	auto inspect = py::module::import("inspect");

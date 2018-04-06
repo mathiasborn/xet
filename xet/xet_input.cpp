@@ -166,7 +166,7 @@ public:
 		}
 		else if (py::isinstance<input::Actor>(r))
 		{
-			auto t = py::cast<input::Actor*>(r);
+			auto t = input::Actor::cast<input::Actor>(r);
 			m_tokens.emplace_back(input::ActiveToken(t));
 		}
 		else

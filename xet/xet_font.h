@@ -11,28 +11,6 @@
 
 namespace xet {
 
-class Font: public boost::intrusive_ref_counter<Font, boost::thread_unsafe_counter>
-{
-public:
-	Font(fs::path const& path, int size);
-	virtual ~Font();
-
-	fs::path m_path;
-	int m_size;
-	FT_Face m_ftFace;
-	hb_font_t* m_hbFont;
-};
-
-typedef boost::intrusive_ptr<Font> PFont;
-
-class FontRegistry
-{
-public:
-	PFont font(fs::path const& path, int size);
-private:
-	std::vector<PFont> m_fonts;
-};
-
 struct GlyphInfo
 {
 	uint32_t codePoint;
@@ -49,15 +27,42 @@ struct GlyphInfo
 
 typedef std::vector<GlyphInfo> GlyphInfos;
 
+class Font;
+
 struct Shape
 {
-	Shape(GlyphInfos&&);
-	
+	Shape(Font const& font, std::u32string const& text);
+
+	bool horizontal = true;
 	GlyphInfos glyphInfos;
-	Size width = 0;
-	Size yBearing = 0;
-	Size height = 0;
+	Size advance = 0;	// total width or height
+	Size baselineToBaseline = 0;
 };
+	
+class Font: public boost::intrusive_ref_counter<Font, boost::thread_unsafe_counter>
+{
+public:
+	Font(fs::path const& path, int size);
+	virtual ~Font();
+	Size nmSize() const { return m_ptSize * 352778; }	// 2.54/100*1e9/72 = 352777.8
+
+	fs::path m_path;
+	int m_ptSize;	// in pt
+	Size m_baselineToBaseline;	// in nm
+	FT_Face m_ftFace;
+	hb_font_t* m_hbFont;
+};
+
+typedef boost::intrusive_ptr<Font> PFont;
+
+class FontRegistry
+{
+public:
+	PFont font(fs::path const& path, int size);
+private:
+	std::vector<PFont> m_fonts;
+};
+
 
 
 }	// namespace xet

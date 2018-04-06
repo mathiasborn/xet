@@ -175,13 +175,12 @@ typedef std::shared_ptr<Tokens> PTokens;
 typedef std::vector<PTokens> Groups;
 //typedef std::shared_ptr<Groups> PGroups;
 
-class Actor: public boost::intrusive_ref_counter<Actor, boost::thread_unsafe_counter>
+class Actor: public PyObjectHolder<Actor>
 {
 public:
 	virtual ~Actor() {};
-	virtual void addedToPage() {};
-	//virtual void addedToPage(xet::PPage&) {};
-	//virtual Tokens addedToTypeSetter() { return {}; }
+	virtual void addedToPage(xet::PPage) {};
+	virtual void addedToTypeSetter(xet::PTypeSetter) {};
 };
 
 /*

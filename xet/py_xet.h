@@ -172,7 +172,7 @@ public:
 	static boost::intrusive_ptr<P> cast(py::object& o)
 	{
 		auto p = py::cast<P*>(o);
-		p->_assignWrap(o.release().ptr());
+		if (p) p->_assignWrap(o.release().ptr());
 		return {p, false};
 	}
 };
