@@ -17,26 +17,29 @@ namespace xet {
 #define GETV(name) decltype(BOOST_PP_CAT(m_, name)) name() const { return BOOST_PP_CAT(m_, name); }
 
 
-class CanvasElement: public boost::intrusive_ref_counter<CanvasElement, boost::thread_unsafe_counter>
+class CanvasElement: public PyObjectHolder<CanvasElement>
 {
 public:
+	CanvasElement(int32_t layer): m_layer(layer) {}
 	virtual ~CanvasElement() {};
+private:
+	int32_t m_layer = 0;	// z-coordinate (depth), elements with higher values appear on top of elements with lower values
+public:
+	GETV(layer)
 };
 
 typedef boost::intrusive_ptr<CanvasElement> PCanvasElement;
 //typedef std::shared_ptr<CanvasElement> PCanvasElement;
 typedef std::vector<PCanvasElement> CanvasElements;
 
-class VisibleCanvasElement: public PyObjectHolder<VisibleCanvasElement>
+class PolygonCanvasElement: public CanvasElement
 {
 public:
-	VisibleCanvasElement(int32_t layer, int32_t cutOrder): m_layer(layer), m_cutOrder(cutOrder) {}
-	virtual ~VisibleCanvasElement() {};
+	PolygonCanvasElement(int32_t layer, int32_t cutOrder): CanvasElement(layer), m_cutOrder(cutOrder) {}
+	virtual ~PolygonCanvasElement() {};
 private:
-	int32_t m_layer = 0;	// z-coordinate (depth), elements with higher values appear on top of elements with lower values
 	int32_t m_cutOrder = 0;	// elements with higher m_cutOrder cut into elements with lower order (on the same layer)
 public:
-	GETV(layer)
 	GETV(cutOrder)
 };
 
@@ -57,10 +60,10 @@ typedef std::shared_ptr<TextArea> PTextArea;
 typedef std::vector<PTextArea> TextAreas;
 */
 
-class TypeSetter: public VisibleCanvasElement//, public PyObjectHolder<TypeSetter>
+class TypeSetter: public PolygonCanvasElement//, public PyObjectHolder<TypeSetter>
 {
 public:
-	typedef VisibleCanvasElement Super;
+	typedef PolygonCanvasElement Super;
 	
 	TypeSetter(int32_t layer, int32_t cutOrder, std::u32string name, bool simple):
 		Super(layer, cutOrder), m_name(name), m_simple(simple) {};
@@ -81,10 +84,10 @@ public:
 //typedef std::shared_ptr<TypeSetter> PTypeSetter;
 typedef boost::intrusive_ptr<TypeSetter> PTypeSetter;
 
-class Canvas: public VisibleCanvasElement//, public PyObjectHolder<Canvas>
+class Canvas: public PolygonCanvasElement//, public PyObjectHolder<Canvas>
 {
 public:
-	typedef VisibleCanvasElement Super;
+	typedef PolygonCanvasElement Super;
 
 	Canvas(int32_t layer = 0, int32_t cutOrder = 0): Super(layer, cutOrder) {};
 	virtual PCPolygonSet geometry() = 0;
