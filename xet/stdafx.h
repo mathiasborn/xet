@@ -19,15 +19,17 @@
 
 #define BOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE
 //#define _HAS_AUTO_PTR_ETC 1
-
+#define BOOST_LIB_DIAGNOSTIC
 
 // TODO: reference additional headers your program requires here
+/*
 #ifdef _DEBUG
 #	define BOOST_DEBUG_PYTHON
 #	define BOOST_LINKING_PYTHON
 #else
 //#	define Py_LIMITED_API
 #endif
+*/
 #define BOOST_SPIRIT_UNICODE
 
 #define BOOST_SPIRIT_DEBUG
