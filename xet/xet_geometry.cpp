@@ -5,6 +5,11 @@
 
 PYBIND11_DECLARE_HOLDER_TYPE(T, boost::intrusive_ptr<T>, true);
 
+#if defined _MSC_VER
+#pragma warning(disable:4244)
+#endif
+
+
 namespace xet {
 
 CPolygonSet::CPolygonSet(Polygon const& p)

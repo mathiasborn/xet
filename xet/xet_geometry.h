@@ -72,7 +72,23 @@ public:
 	friend PCPolygonSet operator-(CPolygonSet const& lhs, const CPolygonSet& rhs);
 private:
 	PolygonSet m_set;
+//	int32_t m_z = 0;	// z-coordinate (depth). In a Stack (see below), elements with higher values appear on top of elements with lower values.
+//public:
+//	int32_t z() const { return m_z; }
 };
+
+class Stack : public boost::intrusive_ref_counter<Stack, boost::thread_unsafe_counter>
+{
+public:
+	Stack() = default;
+	void add(CPolygonSet const& set, int32_t z);
+private:
+	typedef std::unordered_map<int32_t, CPolygonSets> Input;
+	Input m_input;
+	m_output;
+
+};
+
 
 
 void pyInitGeometry(py::module&);
