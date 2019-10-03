@@ -77,6 +77,19 @@ private:
 //	int32_t z() const { return m_z; }
 };
 
+class TypeSetterShape: public PyObjectHolder<TypeSetterShape>
+{
+public:
+	TypeSetterShape(int32_t layer) : m_layer(layer) {}
+	virtual ~TypeSetterShape() {};
+private:
+	int32_t m_layer = 0;	// higher m_layer cut into shapes with lower m_layer
+public:
+	GETV(layer)
+};
+
+
+
 class Stack : public boost::intrusive_ref_counter<Stack, boost::thread_unsafe_counter>
 {
 public:
