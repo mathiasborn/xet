@@ -6,6 +6,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <pybind11/pybind11.h>
+#include "py_xet.h"
 
 namespace gtl = boost::polygon;
 namespace mp = boost::multiprecision;
@@ -77,24 +78,46 @@ private:
 //	int32_t z() const { return m_z; }
 };
 
-class TypeSetterShape: public PyObjectHolder<TypeSetterShape>
+class PolygonShapes: public PyObjectHolder<PolygonShapes>
 {
 public:
-	TypeSetterShape(int32_t layer) : m_layer(layer) {}
-	virtual ~TypeSetterShape() {};
+	PolygonShapes(int32_t layer) : m_layer(layer) {}
+	virtual ~PolygonShapes() {};
 private:
 	int32_t m_layer = 0;	// higher m_layer cut into shapes with lower m_layer
 public:
-	GETV(layer)
+	int32_t layer() const { return m_layer; }
+};
+
+class ConstantPolygonShapes: public PolygonShapes
+{
+public:
+	typedef PolygonShapes Super;
+
+	ConstantPolygonShapes(int32_t layer) : Super(layer) {}
+
+	virtual CPolygonSets polygons() = 0;
+};
+
+class VariablePolygonShapes: public PolygonShapes
+{
+public:
+	typedef PolygonShapes Super;
+
+	VariablePolygonShapes(int32_t layer) : Super(layer) {}
+
+	virtual CPolygonSets polygons(double scale) = 0;
 };
 
 
-
-class Stack : public boost::intrusive_ref_counter<Stack, boost::thread_unsafe_counter>
+class PolygonCompositor: public boost::intrusive_ref_counter<PolygonCompositor, boost::thread_unsafe_counter>
 {
 public:
-	Stack() = default;
-	void add(CPolygonSet const& set, int32_t z);
+	PolygonCompositor() = default;
+
+
+	// check how this will be wrapped by pybind11
+	void add(PolygonShapes);
 private:
 	typedef std::unordered_map<int32_t, CPolygonSets> Input;
 	Input m_input;

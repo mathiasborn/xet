@@ -158,7 +158,7 @@ public:
 			catch(...)
 			{
 				// The instance could not be wrapped. This should not happen and indicates a bug.
-				// We know that the object has been created with "new", otherwise it couldn't be wrapped, thus we can safely "delete this" here.
+				// We know that the object has been created with "new", otherwise it could not have been wrapped, thus we can safely "delete this" here.
 				delete this;
 				throw;
 			}
