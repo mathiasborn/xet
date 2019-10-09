@@ -88,11 +88,12 @@ private:
 public:
 	int32_t layer() const { return m_layer; }
 };
+using PPolygonShapes = PolygonShapes::Pointer;
 
 class ConstantPolygonShapes: public PolygonShapes
 {
 public:
-	typedef PolygonShapes Super;
+	using Super = PolygonShapes;
 
 	ConstantPolygonShapes(int32_t layer) : Super(layer) {}
 
@@ -102,7 +103,7 @@ public:
 class VariablePolygonShapes: public PolygonShapes
 {
 public:
-	typedef PolygonShapes Super;
+	using Super = PolygonShapes;
 
 	VariablePolygonShapes(int32_t layer) : Super(layer) {}
 
@@ -115,14 +116,19 @@ class PolygonCompositor: public boost::intrusive_ref_counter<PolygonCompositor, 
 public:
 	PolygonCompositor() = default;
 
+	void add(PPolygonShapes);
 
-	// check how this will be wrapped by pybind11
-	void add(PolygonShapes);
+	struct Output
+	{
+		CPolygonSets m_polygons;
+		PolygonShapes* m_source;
+	};
+
+	std::vector<Output> const& output() const;
 private:
-	typedef std::unordered_map<int32_t, CPolygonSets> Input;
-	Input m_input;
-	m_output;
-
+	bool m_dirty = true;
+	std::vector<PPolygonShapes> m_input;
+	std::vector<Output> m_output;
 };
 
 
