@@ -10,6 +10,14 @@ import xet
 f = xet.Rectangle(top=0, left=0, width=10, height=20)
 print(f)
 
+class RectShape(xet.VariablePolygonShapes):
+    def __init__(self):
+        return super().__init__(0)
+    def polygons(self, scale):
+        return [xet.Rectangle(top=0, left=0, width=10, height=20*scale)]
+
+rs = RectShape()
+print(rs)
 
 d = xet.Document()
 d.addInput('test.xet')

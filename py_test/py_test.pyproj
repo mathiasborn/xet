@@ -15,6 +15,7 @@
     <EnableNativeCodeDebugging>True</EnableNativeCodeDebugging>
     <Environment>
     </Environment>
+    <SuppressConfigureTestFrameworkPrompt>true</SuppressConfigureTestFrameworkPrompt>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>

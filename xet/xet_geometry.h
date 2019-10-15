@@ -1,5 +1,7 @@
 #pragma once
 
+#include <tuple>
+#include <vector>
 #include <boost/smart_ptr/intrusive_ptr.hpp>
 #include <boost/smart_ptr/intrusive_ref_counter.hpp>
 #include <boost/polygon/polygon.hpp>
@@ -83,6 +85,7 @@ class PolygonShapes: public PyObjectHolder<PolygonShapes>
 public:
 	PolygonShapes(int32_t layer) : m_layer(layer) {}
 	virtual ~PolygonShapes() {};
+	virtual CPolygonSets _polygons(double scale) = 0;
 private:
 	int32_t m_layer = 0;	// higher m_layer cut into shapes with lower m_layer
 public:
@@ -98,6 +101,8 @@ public:
 	ConstantPolygonShapes(int32_t layer) : Super(layer) {}
 
 	virtual CPolygonSets polygons() = 0;
+private:
+	virtual CPolygonSets _polygons(double) { return polygons(); }
 };
 
 class VariablePolygonShapes: public PolygonShapes
@@ -108,6 +113,8 @@ public:
 	VariablePolygonShapes(int32_t layer) : Super(layer) {}
 
 	virtual CPolygonSets polygons(double scale) = 0;
+private:
+	virtual CPolygonSets _polygons(double scale) { return polygons(scale); }
 };
 
 
@@ -117,6 +124,7 @@ public:
 	PolygonCompositor() = default;
 
 	void add(PPolygonShapes);
+	void changeScale(PolygonShapes const*, double);
 
 	struct Output
 	{
@@ -126,9 +134,9 @@ public:
 
 	std::vector<Output> const& output() const;
 private:
-	bool m_dirty = true;
-	std::vector<PPolygonShapes> m_input;
-	std::vector<Output> m_output;
+	mutable bool m_dirty = true;
+	std::vector<std::tuple<PPolygonShapes, double>> m_input;
+	mutable std::vector<Output> m_output;
 };
 
 
