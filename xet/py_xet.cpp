@@ -258,9 +258,9 @@ PYBIND11_MODULE(xet, m)
 		.def_property_readonly_static("ninf", [](py::object){ return input::Penalty::ninf; })
 		.def("__repr__", [](input::Penalty const& a){ return static_cast<std::u32string>(a); });
 
-	py::class_<input::ParagraphSeperator>(m, "ParagraphSeperator")
+	py::class_<input::ParagraphSeparator>(m, "ParagraphSeparator")
 		.def(py::init<>())
-		.def("__repr__", [](input::ParagraphSeperator const& a){ return static_cast<std::u32string>(a); });
+		.def("__repr__", [](input::ParagraphSeparator const& a){ return static_cast<std::u32string>(a); });
 
 	py::class_<input::Push>(m, "Push")
 		.def(py::init<>())

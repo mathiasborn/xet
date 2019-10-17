@@ -109,10 +109,10 @@ private:
 	xet::Size m_width;
 };
 
-class ParagraphSeperator
+class ParagraphSeparator
 {
 public:
-	friend bool operator==(const ParagraphSeperator&, const ParagraphSeperator&)
+	friend bool operator==(const ParagraphSeparator&, const ParagraphSeparator&)
 	{
 		return true;
 	}
@@ -169,7 +169,7 @@ private:
 
 
 
-typedef std::variant<ParagraphSeperator, Penalty, Glue, Text, ActiveToken, Push, Pop, Stream, InitialPage> Token;
+typedef std::variant<ParagraphSeparator, Penalty, Glue, Text, ActiveToken, Push, Pop, Stream, InitialPage> Token;
 typedef std::vector<Token> Tokens;
 typedef std::shared_ptr<Tokens> PTokens;
 typedef std::vector<PTokens> Groups;

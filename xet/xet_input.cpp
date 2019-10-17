@@ -65,9 +65,9 @@ Penalty::operator std::u32string() const
 	return U"xet.Penalty("s + uts::toUtf32(m_value) + U", " + uts::toUtf32(m_width) + U')';
 }
 
-ParagraphSeperator::operator std::u32string() const
+ParagraphSeparator::operator std::u32string() const
 {
-	return U"xet.ParagraphSeperator"s;
+	return U"xet.ParagraphSeparator"s;
 }
 
 Push::operator std::u32string() const
@@ -154,7 +154,7 @@ public:
 		{
 			m_tokens.emplace_back(input::Text(py::cast<std::u32string>(r)));
 		}
-		else if (py::isinstance<input::Text>(r) || py::isinstance<input::Glue>(r) || py::isinstance<input::Penalty>(r) || py::isinstance<input::ParagraphSeperator>(r) || py::isinstance<input::Push>(r) || py::isinstance<input::Pop>(r) || py::isinstance<input::Stream>(r) || py::isinstance<input::InitialPage>(r))
+		else if (py::isinstance<input::Text>(r) || py::isinstance<input::Glue>(r) || py::isinstance<input::Penalty>(r) || py::isinstance<input::ParagraphSeparator>(r) || py::isinstance<input::Push>(r) || py::isinstance<input::Pop>(r) || py::isinstance<input::Stream>(r) || py::isinstance<input::InitialPage>(r))
 		{
 			auto t = py::cast<input::Token>(r);
 			m_tokens.push_back(t);
@@ -183,7 +183,7 @@ public:
 	void operator()(parser::NewParagraph const&)
 	{
 		m_tokens.emplace_back(
-			Token(std::in_place_type_t<ParagraphSeperator>())
+			Token(std::in_place_type_t<ParagraphSeparator>())
 		);
 	}
 
